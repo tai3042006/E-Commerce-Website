@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLOFIT — Wear Your Story</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="transition-colors duration-300">
+
+  <!-- ======================================================
+       NAVBAR
+  ====================================================== -->
+  <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-20">
+
+      <!-- Logo -->
+      <a href="#" class="logo-text text-3xl tracking-widest font-bold select-none">CLOFIT</a>
+
+      <!-- Desktop Nav Links -->
+      <ul class="hidden md:flex items-center gap-10 nav-links text-sm tracking-widest uppercase">
+        <li><a href="#collection" class="nav-link">Collection</a></li>
+        <li><a href="#features"   class="nav-link">Features</a></li>
+        <li><a href="#products"   class="nav-link">Shop</a></li>
+        <li><a href="#contact"    class="nav-link">Contact</a></li>
+      </ul>
+
+      <!-- Right Actions -->
+      <div class="flex items-center gap-5">
+        <!-- Search -->
+        <button id="searchBtn" aria-label="Search" class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z"/>
+          </svg>
+        </button>
+
+        <!-- Cart -->
+        <button id="cartBtn" aria-label="Cart" class="icon-btn relative">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.998-7.093a60.334 60.334 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+          </svg>
+          <span id="cartCount" class="cart-badge hidden">0</span>
+        </button>
+
+        <!-- Dark Mode Toggle -->
+        <button id="themeToggle" aria-label="Toggle theme" class="icon-btn">
+          <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 hidden">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/>
+          </svg>
+          <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/>
+          </svg>
+        </button>
+
+        <!-- Hamburger (mobile) -->
+        <button id="hamburger" aria-label="Menu" class="md:hidden icon-btn flex-col gap-1.5 flex">
+          <span class="ham-line"></span>
+          <span class="ham-line"></span>
+          <span class="ham-line ham-short"></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu hidden md:hidden px-6 pb-6 pt-2">
+      <ul class="flex flex-col gap-5 nav-links text-sm tracking-widest uppercase">
+        <li><a href="#collection" class="nav-link" onclick="closeMobileMenu()">Collection</a></li>
+        <li><a href="#features"   class="nav-link" onclick="closeMobileMenu()">Features</a></li>
+        <li><a href="#products"   class="nav-link" onclick="closeMobileMenu()">Shop</a></li>
+        <li><a href="#contact"    class="nav-link" onclick="closeMobileMenu()">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Search Overlay -->
+  <div id="searchOverlay" class="search-overlay hidden">
+    <div class="search-box">
+      <input id="searchInput" type="text" placeholder="Search for styles, shirts, collections…" autocomplete="off" />
+      <button id="closeSearch" aria-label="Close search">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div id="searchResults" class="search-results"></div>
+  </div>
+
+
+  <!-- ======================================================
+       HERO SECTION
+  ====================================================== -->
+  <section id="hero" class="hero-section relative min-h-screen flex items-center overflow-hidden">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-accent-circle"></div>
+
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 w-full pt-20 grid lg:grid-cols-2 gap-16 items-center">
+      <!-- Left -->
+      <div class="hero-content">
+        <span class="pill-badge mb-6 inline-block">✦ New SS 2025 Collection</span>
+        <h1 class="hero-headline">
+          Wear<br/>
+          <em>Your</em><br/>
+          Story.
+        </h1>
+        <p class="hero-subtext mt-6 max-w-md">
+          Precision-cut garments for those who refuse to be ordinary.
+          Crafted from sustainable materials, designed for every chapter of life.
+        </p>
+        <div class="flex flex-wrap gap-4 mt-10">
+          <a href="#products" class="btn-primary">Shop Now</a>
+          <a href="#collection" class="btn-ghost">Explore Lookbook</a>
+        </div>
+        <div class="flex gap-10 mt-14">
+          <div class="stat-item">
+            <span class="stat-number" data-target="12000">0</span><span class="stat-plus">+</span>
+            <p>Happy Customers</p>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="340">0</span><span class="stat-plus">+</span>
+            <p>Styles Available</p>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="98">0</span><span class="stat-plus">%</span>
+            <p>Satisfaction Rate</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Hero Visual -->
+      <div class="hero-visual relative hidden lg:flex items-center justify-center">
+        <div class="hero-card-main">
+          <div class="hero-img-placeholder">
+            <div class="cloth-illustration">
+              <div class="shirt-shape">
+                <div class="shirt-collar"></div>
+                <div class="shirt-body"></div>
+                <div class="shirt-sleeve left"></div>
+                <div class="shirt-sleeve right"></div>
+                <div class="shirt-button"></div>
+                <div class="shirt-button b2"></div>
+                <div class="shirt-button b3"></div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-card-badge">
+            <span>🔥 Trending Now</span>
+          </div>
+        </div>
+        <div class="hero-card-float float-1">
+          <span class="text-xs tracking-widest">ECO MATERIAL</span>
+          <p class="text-sm font-semibold mt-1">100% Organic Cotton</p>
+        </div>
+        <div class="hero-card-float float-2">
+          <span class="text-xs tracking-widest">FREE SHIPPING</span>
+          <p class="text-sm font-semibold mt-1">Orders over $50</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+
+  <!-- ======================================================
+       COLLECTION STRIP (Marquee)
+  ====================================================== -->
+  <section class="marquee-section overflow-hidden py-5">
+    <div class="marquee-track">
+      <span>CLOFIT</span><span class="dot">✦</span>
+      <span>SUMMER DROPS</span><span class="dot">✦</span>
+      <span>LIMITED EDITION</span><span class="dot">✦</span>
+      <span>ETHICALLY MADE</span><span class="dot">✦</span>
+      <span>WEAR YOUR STORY</span><span class="dot">✦</span>
+      <span>CLOFIT</span><span class="dot">✦</span>
+      <span>SUMMER DROPS</span><span class="dot">✦</span>
+      <span>LIMITED EDITION</span><span class="dot">✦</span>
+      <span>ETHICALLY MADE</span><span class="dot">✦</span>
+      <span>WEAR YOUR STORY</span><span class="dot">✦</span>
+    </div>
+  </section>
+
+
+  <!-- ======================================================
+       COLLECTION SECTION
+  ====================================================== -->
+  <section id="collection" class="section-wrapper">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+      <div class="section-header text-center mb-16">
+        <span class="section-label">✦ Curated For You</span>
+        <h2 class="section-title mt-3">The Collection</h2>
+        <p class="section-sub mt-4 max-w-xl mx-auto">From minimalist linens to bold graphic tees — every piece tells a different story.</p>
+      </div>
+
+      <!-- Category Pills -->
+      <div class="flex flex-wrap gap-3 justify-center mb-12" id="categoryFilter">
+        <button class="filter-pill active" data-cat="all">All Styles</button>
+        <button class="filter-pill" data-cat="shirt">Shirts</button>
+        <button class="filter-pill" data-cat="tee">T-Shirts</button>
+        <button class="filter-pill" data-cat="jacket">Jackets</button>
+        <button class="filter-pill" data-cat="formal">Formal</button>
+      </div>
+
+      <!-- Collection Grid (lookbook style) -->
+      <div class="collection-grid" id="collectionGrid">
+        <div class="collection-card col-span-2" data-cat="shirt">
+          <div class="collection-img ci-1">
+            <div class="collection-label">Oxford Blue</div>
+          </div>
+          <div class="collection-info">
+            <h3>Classic Oxford Shirt</h3>
+            <span>Premium Cotton · Slim Fit</span>
+          </div>
+        </div>
+        <div class="collection-card" data-cat="tee">
+          <div class="collection-img ci-2">
+            <div class="collection-label">Off White</div>
+          </div>
+          <div class="collection-info">
+            <h3>Minimal Graphic Tee</h3>
+            <span>Organic Cotton</span>
+          </div>
+        </div>
+        <div class="collection-card" data-cat="jacket">
+          <div class="collection-img ci-3">
+            <div class="collection-label">Charcoal</div>
+          </div>
+          <div class="collection-info">
+            <h3>Harrington Jacket</h3>
+            <span>Water Resistant</span>
+          </div>
+        </div>
+        <div class="collection-card" data-cat="formal">
+          <div class="collection-img ci-4">
+            <div class="collection-label">Ivory</div>
+          </div>
+          <div class="collection-info">
+            <h3>Linen Formal Shirt</h3>
+            <span>Italian Linen · Regular Fit</span>
+          </div>
+        </div>
+        <div class="collection-card col-span-2" data-cat="tee">
+          <div class="collection-img ci-5">
+            <div class="collection-label">Earth Tones</div>
+          </div>
+          <div class="collection-info">
+            <h3>Oversized Vintage Tee</h3>
+            <span>Heavyweight 280gsm Cotton</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================================================
+       FEATURES SHOWCASE
+  ====================================================== -->
+  <section id="features" class="section-wrapper features-bg">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+      <div class="section-header text-center mb-16">
+        <span class="section-label">✦ Why CLOFIT</span>
+        <h2 class="section-title mt-3">Built Different</h2>
+        <p class="section-sub mt-4 max-w-xl mx-auto">Every stitch, every fabric, every decision — made with intention.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature Card 1 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">🌿</div>
+          <h3>Sustainable Materials</h3>
+          <p>100% GOTS-certified organic cotton. Zero microplastics. Packaging that returns to earth.</p>
+          <div class="feature-line"></div>
+        </div>
+        <!-- Feature Card 2 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">✂️</div>
+          <h3>Master Tailoring</h3>
+          <p>Each garment is cut by artisans with 15+ years of expertise. Fit engineered for every body type.</p>
+          <div class="feature-line"></div>
+        </div>
+        <!-- Feature Card 3 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">🎨</div>
+          <h3>Seasonal Drops</h3>
+          <p>Limited collections, not mass production. Own something truly rare — released every quarter.</p>
+          <div class="feature-line"></div>
+        </div>
+        <!-- Feature Card 4 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">🚚</div>
+          <h3>Free Express Shipping</h3>
+          <p>Orders over $50 ship free, worldwide. 2-day delivery in US. Full tracking from warehouse to door.</p>
+          <div class="feature-line"></div>
+        </div>
+        <!-- Feature Card 5 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">🔄</div>
+          <h3>60-Day Returns</h3>
+          <p>Changed your mind? No problem. Free returns within 60 days, no questions asked, full refund.</p>
+          <div class="feature-line"></div>
+        </div>
+        <!-- Feature Card 6 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">👕</div>
+          <h3>Size for Everyone</h3>
+          <p>XS to 4XL available in every style. We believe great fashion should fit all bodies equally.</p>
+          <div class="feature-line"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================================================
+       PRODUCTS / SHOP SECTION
+  ====================================================== -->
+  <section id="products" class="section-wrapper">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+      <div class="section-header flex flex-wrap items-end justify-between gap-6 mb-12">
+        <div>
+          <span class="section-label">✦ Shop</span>
+          <h2 class="section-title mt-3">Best Sellers</h2>
+        </div>
+        <div class="flex gap-3 items-center">
+          <label class="text-sm tracking-wide">Sort by:</label>
+          <select id="sortSelect" class="sort-select">
+            <option value="default">Featured</option>
+            <option value="price-asc">Price: Low → High</option>
+            <option value="price-desc">Price: High → Low</option>
+            <option value="rating">Top Rated</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Product Grid -->
+      <div class="products-grid" id="productsGrid"></div>
+
+      <div class="text-center mt-12">
+        <button id="loadMore" class="btn-primary">Load More Styles</button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================================================
+       TESTIMONIALS
+  ====================================================== -->
+  <section class="section-wrapper testimonials-bg">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+      <div class="section-header text-center mb-14">
+        <span class="section-label">✦ Reviews</span>
+        <h2 class="section-title mt-3">What They Say</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal">
+          <div class="stars">★★★★★</div>
+          <p>"CLOFIT changed how I think about my wardrobe. The Oxford shirt fits like it was made for me. The fabric quality is unmatched."</p>
+          <div class="reviewer">
+            <div class="reviewer-avatar av1">AJ</div>
+            <div><strong>Alex Johnson</strong><span>Verified Buyer · New York</span></div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal">
+          <div class="stars">★★★★★</div>
+          <p>"Ordered three pieces on a Friday, arrived Monday. Packaging was gorgeous. The graphic tee is now my most complimented item."</p>
+          <div class="reviewer">
+            <div class="reviewer-avatar av2">SM</div>
+            <div><strong>Sofia Martinez</strong><span>Verified Buyer · Los Angeles</span></div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal">
+          <div class="stars">★★★★☆</div>
+          <p>"Beautifully made linen shirt. Wore it to a wedding and got asked about it all night. Sizing was spot on from the guide."</p>
+          <div class="reviewer">
+            <div class="reviewer-avatar av3">KP</div>
+            <div><strong>Kai Patel</strong><span>Verified Buyer · London</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================================================
+       NEWSLETTER BAND
+  ====================================================== -->
+  <section class="newsletter-band">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <h2 class="section-title">Get Early Access</h2>
+      <p class="mt-4 newsletter-sub">Join 12,000+ members who get first looks, exclusive drops, and 15% off their first order.</p>
+      <form id="newsletterForm" class="newsletter-form mt-8" onsubmit="handleNewsletter(event)">
+        <input type="email" placeholder="your@email.com" required />
+        <button type="submit">Subscribe</button>
+      </form>
+      <p class="newsletter-note mt-4">No spam. Unsubscribe anytime. We respect your inbox.</p>
+    </div>
+  </section>
+
+
+  <!-- ======================================================
+       CONTACT FORM
+  ====================================================== -->
+  <section id="contact" class="section-wrapper">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-2 gap-16 items-start">
+      <!-- Left: Info -->
+      <div class="contact-info reveal">
+        <span class="section-label">✦ Get in Touch</span>
+        <h2 class="section-title mt-3">Let's Talk<br/><em>Fashion.</em></h2>
+        <p class="section-sub mt-5">Questions about an order? Styling advice? Partnership inquiries? Our team replies within 24 hours.</p>
+        <div class="contact-details mt-10 flex flex-col gap-6">
+          <div class="contact-item">
+            <span class="contact-icon">📍</span>
+            <div>
+              <strong>Studio</strong>
+              <p>147 Fashion District Blvd, Suite 300<br/>New York, NY 10001</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">📧</span>
+            <div>
+              <strong>Email</strong>
+              <p>hello@clofit.com</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">📞</span>
+            <div>
+              <strong>Phone</strong>
+              <p>+1 (800) CLOFIT-1</p>
+            </div>
+          </div>
+        </div>
+        <div class="social-links mt-10 flex gap-5">
+          <a href="#" class="social-btn">IG</a>
+          <a href="#" class="social-btn">TK</a>
+          <a href="#" class="social-btn">FB</a>
+          <a href="#" class="social-btn">TW</a>
+        </div>
+      </div>
+
+      <!-- Right: Form -->
+      <div class="contact-form-card reveal">
+        <form id="contactForm" onsubmit="handleContact(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" name="firstName" placeholder="Alex" required />
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" name="lastName" placeholder="Johnson" required />
+            </div>
+          </div>
+          <div class="form-group mt-5">
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="alex@email.com" required />
+          </div>
+          <div class="form-group mt-5">
+            <label>Subject</label>
+            <select name="subject" required>
+              <option value="">Select a topic…</option>
+              <option value="order">Order Inquiry</option>
+              <option value="return">Return / Exchange</option>
+              <option value="styling">Styling Advice</option>
+              <option value="wholesale">Wholesale / Partnership</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group mt-5">
+            <label>Message</label>
+            <textarea name="message" rows="5" placeholder="Tell us what's on your mind…" required></textarea>
+          </div>
+          <button type="submit" class="btn-primary w-full mt-8 text-center">
+            Send Message
+          </button>
+          <div id="formSuccess" class="form-success hidden mt-4">
+            ✅ Thanks! We'll get back to you within 24 hours.
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================================================
+       FOOTER
+  ====================================================== -->
+  <footer class="footer">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+      <div class="footer-top grid grid-cols-2 md:grid-cols-4 gap-10 pb-12 border-b border-opacity-20">
+        <!-- Brand -->
+        <div class="col-span-2 md:col-span-1">
+          <span class="logo-text text-2xl tracking-widest font-bold">CLOFIT</span>
+          <p class="footer-tagline mt-3">Wear Your Story.<br/>Fashion with intention.</p>
+          <div class="mt-5 flex gap-3">
+            <a href="#" class="social-btn sm">IG</a>
+            <a href="#" class="social-btn sm">TK</a>
+            <a href="#" class="social-btn sm">TW</a>
+          </div>
+        </div>
+        <!-- Shop -->
+        <div>
+          <h4 class="footer-heading">Shop</h4>
+          <ul class="footer-links">
+            <li><a href="#products">All Products</a></li>
+            <li><a href="#collection">New Arrivals</a></li>
+            <li><a href="#">Sale</a></li>
+            <li><a href="#">Gift Cards</a></li>
+          </ul>
+        </div>
+        <!-- Help -->
+        <div>
+          <h4 class="footer-heading">Help</h4>
+          <ul class="footer-links">
+            <li><a href="#">Size Guide</a></li>
+            <li><a href="#">Shipping Info</a></li>
+            <li><a href="#">Returns</a></li>
+            <li><a href="#contact">Contact Us</a></li>
+          </ul>
+        </div>
+        <!-- Company -->
+        <div>
+          <h4 class="footer-heading">Company</h4>
+          <ul class="footer-links">
+            <li><a href="#">About CLOFIT</a></li>
+            <li><a href="#">Sustainability</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom flex flex-wrap gap-4 items-center justify-between pt-8 pb-6">
+        <p class="text-sm">© 2025 CLOFIT. All rights reserved. Made with ♥ and intention.</p>
+        <div class="flex gap-5 text-sm footer-legal">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Cookie Settings</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ======================================================
+       CART DRAWER
+  ====================================================== -->
+  <div id="cartOverlay" class="cart-overlay hidden" onclick="toggleCart()"></div>
+  <aside id="cartDrawer" class="cart-drawer translate-x-full">
+    <div class="cart-header">
+      <h2>Your Cart (<span id="cartItemCount">0</span>)</h2>
+      <button onclick="toggleCart()" aria-label="Close cart">✕</button>
+    </div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cartTotal">$0.00</span>
+      </div>
+      <button class="btn-primary w-full mt-4" onclick="checkout()">Checkout →</button>
+    </div>
+    <div id="cartEmpty" class="cart-empty">
+      <p>🛒</p>
+      <p>Your cart is empty</p>
+      <a href="#products" onclick="toggleCart()">Start Shopping</a>
+    </div>
+  </aside>
+
+
+  <!-- ======================================================
+       TOAST NOTIFICATION
+  ====================================================== -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
