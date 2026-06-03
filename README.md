@@ -1,44 +1,156 @@
 # CLOFIT
 
-Fashion & Sportswear Ecommerce Website
+## Fashion & Sportswear E-Commerce Website
 
-## Introduction
+CLOFIT is a modern e-commerce platform specializing in fashion and sportswear products. The project is developed from a mobile-first UI/UX design and transformed into a responsive web application that provides a seamless shopping experience across desktop, tablet, and mobile devices.
 
-CLOFIT is a responsive ecommerce website developed from a mobile-first UI/UX design and adapted into a modern web platform.
-
-The project focuses on providing a clean, intuitive, and professional shopping experience for fashion and sportswear products.
+The system allows customers to browse products, manage shopping carts, place orders, track purchases, and receive notifications about new products and promotions. The architecture is designed following Object-Oriented Design principles and Design Patterns to ensure maintainability, scalability, and future expansion.
 
 ---
 
-## Objectives
+## Project Objectives
 
-- Build a responsive ecommerce website
-- Apply modern frontend development practices
-- Improve UI/UX from a mobile application design
-- Prepare the system for future backend integration
+* Develop a responsive e-commerce website.
+* Apply Object-Oriented Analysis and Design (OOAD).
+* Implement modern frontend development practices.
+* Provide a user-friendly shopping experience.
+* Prepare the system for backend integration and database deployment.
+* Apply Design Patterns in real-world business scenarios.
 
 ---
 
-## Features
+## Main Features
 
-### Customer
+### Customer Features
 
-- User Registration
-- User Login
-- Product Browsing
-- Product Search
-- Product Categories
-- Product Details
-- Favorites
-- Shopping Cart
-- Checkout
-- Order Confirmation
+#### Authentication
 
-### Profile
+* User Registration
+* User Login
+* User Logout
+* Account Management
 
-- User Information
-- Account Settings
-- Order Tracking
+#### Product Management
+
+* Browse Products
+* Search Products
+* View Product Details
+* Filter Products by Category
+* Product Recommendations
+
+#### Shopping Features
+
+* Add Products to Favorites
+* Shopping Cart Management
+* Update Product Quantity
+* Remove Products from Cart
+* Checkout Process
+* Order Confirmation
+
+#### Profile Management
+
+* Personal Information
+* Account Settings
+* Order History
+* Order Tracking
+
+#### Notifications
+
+* New Product Notifications
+* Promotion Notifications
+* Order Status Updates
+
+---
+
+### Administrator Features
+
+* Manage Products
+* Manage Categories
+* Manage Customer Accounts
+* Manage Orders
+* View Dashboard Statistics
+* Manage Promotions
+* Send Notifications to Customers
+
+---
+
+## Applied Design Patterns
+
+### Strategy Pattern
+
+Used to support multiple payment methods.
+
+```text
+PaymentStrategy
+├── CreditCardPayment
+├── CashPayment
+└── EWalletPayment
+```
+
+Benefits:
+
+* Easy to add new payment methods.
+* Follows Open/Closed Principle.
+* Reduces code duplication.
+
+---
+
+### Factory Pattern
+
+Used to create payment strategy objects dynamically.
+
+```text
+PaymentFactory
+└── createPayment(type)
+```
+
+Benefits:
+
+* Encapsulates object creation.
+* Reduces coupling between components.
+
+---
+
+### Observer Pattern
+
+Used for notification services.
+
+Scenario:
+
+* Admin adds a new product.
+* Product Catalog updates.
+* Users subscribed to notifications receive updates automatically.
+
+```text
+Admin
+   ↓
+Product Catalog (Subject)
+   ↓
+notifyObservers()
+   ↓
+User (Observer)
+```
+
+Benefits:
+
+* Loose coupling.
+* Real-time notification mechanism.
+
+---
+
+### Singleton Pattern
+
+Used for system configuration management.
+
+```text
+SystemConfig
+└── getInstance()
+```
+
+Benefits:
+
+* Ensures only one configuration instance exists.
+* Centralized system settings management.
 
 ---
 
@@ -46,18 +158,19 @@ The project focuses on providing a clean, intuitive, and professional shopping e
 
 ### Frontend
 
-- React
-- TypeScript
-- Tailwind CSS
-- React Router
-- Vite
+* React
+* TypeScript
+* Tailwind CSS
+* React Router
+* Vite
 
-### Tools
+### Development Tools
 
-- Git
-- GitHub
-- Figma
-- VS Code
+* Git
+* GitHub
+* VS Code
+* Figma
+* Postman
 
 ---
 
@@ -65,87 +178,108 @@ The project focuses on providing a clean, intuitive, and professional shopping e
 
 ```bash
 src/
-├── assets/
-├── components/
-├── data/
-├── hooks/
-├── layouts/
-├── pages/
-├── routes/
-├── services/
-├── types/
-└── utils/
+├── assets/          # Images, icons, static resources
+├── components/      # Reusable UI components
+├── data/            # Mock data
+├── hooks/           # Custom React hooks
+├── layouts/         # Application layouts
+├── pages/           # Application pages
+├── routes/          # Route configuration
+├── services/        # API services
+├── types/           # TypeScript interfaces
+├── utils/           # Utility functions
+└── App.tsx
 ```
 
 ---
 
 ## Team Members
 
-| Student ID | Full Name | Role |
-|------------|-----------|------|
-| XXXXXXXX | Tran Nguyen Anh Tai | Frontend Developer |
-| XXXXXXXX | Member 2 | UI/UX Design |
-| XXXXXXXX | Member 3 | Backend Developer |
-| XXXXXXXX | Member 4 | Database Developer |
+| Student ID | Full Name             | Responsibility                   |
+| ---------- | --------------------- | -------------------------------- |
+| 24130270   | Trần Nguyễn Anh Tài   | Team Leader & Frontend Developer |
+| 24130366   | Đặng Anh Vĩ           | Database Developer               |
+| 19130113   | Trương Huỳnh Anh Kiệt | Frontend Developer               |
+| 24130375   | Nguyễn Quý Vinh       | Backend Developer                |
+| 24130037   | Nguyễn Công Danh      | UI/UX Designer                   |
 
 ---
 
 ## Task Distribution
 
-### Tran Nguyen Anh Tai
+### Trần Nguyễn Anh Tài (Team Leader)
 
-- Frontend Development
-- React Components
-- Responsive Layout
-- Routing System
+* Project Planning
+* Team Coordination
+* Frontend Development
+* React Components
+* Routing System
+* Integration & Deployment
+* Use Case Diagram
 
-### Member 2
+### Đặng Anh Vĩ
 
-- UI/UX Design
-- Figma Design
-- User Experience Review
+* Database Design
+* ERD Diagram
+* Data Modeling
+* Database Integration
+* Query Optimization
 
-### Member 3
+### Trương Huỳnh Anh Kiệt
 
-- Backend API Development
-- Authentication
-- Business Logic
+* Frontend Development
+* Responsive Layout
+* UI Components
+* State Management
+* Frontend Testing
+* Documentation Support
 
-### Member 4
+### Nguyễn Quý Vinh
 
-- Database Design
-- Data Modeling
-- Database Integration
+* Backend Development
+* RESTful API Development
+* Authentication & Authorization
+* Business Logic Implementation
+* Class Diagram
+* Sequence Diagram
+
+### Nguyễn Công Danh
+
+* UI/UX Design
+* Figma Prototype
+* Design System
+* User Experience Evaluation
+* Interface Design
 
 ---
 
-## Installation
+## Installation Guide
 
-Clone repository:
+### Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/tai3042006/E-Commerce-Website.git
 ```
 
-Install dependencies:
+### Install Dependencies
 
 ```bash
 npm install
 ```
 
-Run development server:
+### Run Development Server
 
 ```bash
 npm run dev
 ```
 
-Build project:
+### Build Production Version
 
 ```bash
 npm run build
 ```
 
-Preview production build:
+### Preview Production Build
 
 ```bash
 npm run preview
@@ -153,29 +287,54 @@ npm run preview
 
 ---
 
-## Future Development
+## Future Enhancements
 
-- MySQL Integration
-- JWT Authentication
-- Admin Dashboard
-- Payment Gateway
-- Product Management
-- Order Management
+### Backend Integration
+
+* RESTful API
+* Spring Boot / ExpressJS
+* JWT Authentication
+
+### Database
+
+* MySQL
+* PostgreSQL
+
+### E-Commerce Features
+
+* Product Management
+* Inventory Management
+* Order Management
+* Customer Management
+* Review & Rating System
+
+### Payment Integration
+
+* VNPay
+* MoMo
+* PayPal
+* Stripe
+
+### Analytics & Reporting
+
+* Sales Reports
+* Customer Analytics
+* Product Performance Statistics
 
 ---
 
 ## Academic Information
 
-Course: Software Engineering / Web Development
+**Course:** Object-Oriented Design / Software Engineering
 
-Project Type: Team Project
+**Project Type:** Team Project
 
-Institution: Nong Lam University (NLU)
+**Institution:** Nong Lam University (NLU)
 
-Academic Year: 2025 - 2026
+**Academic Year:** 2025 - 2026
 
 ---
 
 ## License
 
-Educational Purpose Only
+This project is developed for educational and academic purposes only.
