@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* CloFit Design System — minimal black & white, Inter typography */
+/* CloFit Design System — premium minimal monochrome */
 
 @layer base {
   :root {
@@ -32,6 +32,9 @@
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
+    --success: 142 60% 38%;
+    --warning: 38 92% 50%;
+
     --border: 0 0% 90%;
     --input: 0 0% 88%;
     --ring: 0 0% 6%;
@@ -44,8 +47,11 @@
 
     --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.04), 0 4px 16px hsl(0 0% 0% / 0.04);
     --shadow-soft: 0 8px 32px hsl(0 0% 0% / 0.06);
+    --shadow-pop: 0 24px 60px -16px hsl(0 0% 0% / 0.18), 0 8px 24px -8px hsl(0 0% 0% / 0.08);
+    --shadow-glow: 0 0 0 1px hsl(0 0% 0% / 0.06), 0 30px 80px -20px hsl(0 0% 0% / 0.25);
 
-    --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -62,40 +68,32 @@
     --foreground: 0 0% 98%;
     --card: 0 0% 6%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 6%;
+    --popover: 0 0% 8%;
     --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
     --primary-foreground: 0 0% 6%;
-    --secondary: 0 0% 14%;
+    --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14%;
+    --muted: 0 0% 12%;
     --muted-foreground: 0 0% 64%;
     --accent: 0 0% 14%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 18%;
+    --border: 0 0% 16%;
     --input: 0 0% 18%;
     --ring: 0 0% 84%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --price-strike: 0 0% 50%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
 
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
@@ -104,20 +102,44 @@
     font-feature-settings: 'cv11', 'ss01';
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight;
+  h1, h2, h3, h4, h5, h6 { @apply font-bold tracking-tight; }
+
+  ::selection { background: hsl(var(--foreground)); color: hsl(var(--background)); }
+
+  /* Subtle scrollbar */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.5); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 @layer utilities {
   .container-clofit {
-    @apply mx-auto w-full max-w-[1320px] px-5 sm:px-8 lg:px-12;
+    @apply mx-auto w-full max-w-[1360px] px-5 sm:px-8 lg:px-12;
   }
-  .price-strike {
-    color: hsl(var(--price-strike));
-    text-decoration: line-through;
+  .price-strike { color: hsl(var(--price-strike)); text-decoration: line-through; }
+  .link-blue { color: hsl(var(--link)); }
+  .glass {
+    background: hsl(var(--background) / 0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
   }
-  .link-blue {
-    color: hsl(var(--link));
+  .glass-strong {
+    background: hsl(var(--background) / 0.88);
+    backdrop-filter: saturate(180%) blur(28px);
+  }
+  .text-balance { text-wrap: balance; }
+  .font-serif-display { font-family: 'Instrument Serif', serif; font-feature-settings: 'liga'; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .mask-fade-r {
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent);
+    mask-image: linear-gradient(to right, black 80%, transparent);
   }
 }

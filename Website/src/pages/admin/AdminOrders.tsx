@@ -1,17 +1,12 @@
 import { useMemo, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { OrderStatus, statusStyles } from "@/data/admin";
-import { useOrders } from "@/context/OrderContext";
+import { OrderStatus, orders, statusStyles } from "@/data/admin";
 
 const filters: ("all" | OrderStatus)[] = ["all", "pending", "processing", "shipped", "delivered", "cancelled"];
 
 const AdminOrders = () => {
-  const { orders } = useOrders();
   const [filter, setFilter] = useState<(typeof filters)[number]>("all");
-  const list = useMemo(
-    () => (filter === "all" ? orders : orders.filter((o) => o.status === filter)),
-    [filter, orders]
-  );
+  const list = useMemo(() => (filter === "all" ? orders : orders.filter((o) => o.status === filter)), [filter]);
 
   return (
     <AdminLayout title="Orders">
@@ -21,9 +16,7 @@ const AdminOrders = () => {
             key={f}
             onClick={() => setFilter(f)}
             className={`rounded-pill border px-4 py-2 text-sm font-medium capitalize transition-colors ${
-              filter === f
-                ? "border-foreground bg-foreground text-background"
-                : "border-border text-muted-foreground hover:text-foreground"
+              filter === f ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:text-foreground"
             }`}
           >
             {f}
@@ -50,15 +43,8 @@ const AdminOrders = () => {
             </thead>
             <tbody className="divide-y divide-border">
               {list.map((o) => (
-                <tr key={o.id} className={`hover:bg-secondary/30 ${o.isNew ? "bg-emerald-50/60" : ""}`}>
-                  <td className="px-5 py-3 font-medium">
-                    {o.id}
-                    {o.isNew && (
-                      <span className="ml-2 inline-flex rounded-pill bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
-                        NEW
-                      </span>
-                    )}
-                  </td>
+                <tr key={o.id} className="hover:bg-secondary/30">
+                  <td className="px-5 py-3 font-medium">{o.id}</td>
                   <td className="px-5 py-3">
                     <div>{o.customer}</div>
                     <div className="text-xs text-muted-foreground">{o.email}</div>
@@ -68,18 +54,12 @@ const AdminOrders = () => {
                   <td className="px-5 py-3">{o.items}</td>
                   <td className="px-5 py-3 font-semibold">${o.total}</td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex rounded-pill px-2.5 py-1 text-xs font-medium capitalize ${statusStyles[o.status]}`}>
-                      {o.status}
-                    </span>
+                    <span className={`inline-flex rounded-pill px-2.5 py-1 text-xs font-medium capitalize ${statusStyles[o.status]}`}>{o.status}</span>
                   </td>
                 </tr>
               ))}
               {list.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-muted-foreground">
-                    No orders in this status.
-                  </td>
-                </tr>
+                <tr><td colSpan={7} className="px-5 py-10 text-center text-muted-foreground">No orders in this status.</td></tr>
               )}
             </tbody>
           </table>

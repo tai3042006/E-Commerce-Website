@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/clofit/Layout";
 import { ProductCard } from "@/components/clofit/ProductCard";
-import { getProducts } from "@/data/products";
+import { products } from "@/data/products";
 import heroModel from "@/assets/hero-model.jpg";
 import { ArrowRight } from "lucide-react";
 
@@ -99,7 +99,7 @@ const Index = () => {
         </div>
 
         <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
-          {getProducts().slice(0, 4).map((p) => (
+          {products.slice(0, 4).map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>
