@@ -251,8 +251,8 @@ src/
 
 ```bash
 # Clone the repository
-git clone https://github.com/nhom18/clofit-ecommerce.git
-cd clofit-ecommerce
+git clone https://github.com/tai3042006/E-Commerce-Website.git
+cd Website
 
 # Install dependencies (pick one)
 npm install
