@@ -91,64 +91,112 @@ The platform simulates a real-world streetwear shopping experience with customer
 
 The application is architectured around **6 core design patterns** from OOP:
 
-### 1. 🏭 Factory Pattern
-`PaymentFactory` creates payment strategy objects at runtime based on the payment type string.
+## Design Patterns
 
-```typescript
-// PaymentFactory decides which strategy to instantiate
-class PaymentFactory {
-  static createPayment(type: 'credit' | 'cash' | 'ewallet'): PaymentStrategy
-}
-```
+### 🏭 Factory Pattern
 
-### 2. 🏛️ MVC Pattern
-The entire application follows a clear Model-View-Controller separation:
+**Purpose:** Create payment objects dynamically based on the payment method selected by the user.
 
-- **Model** — `products.ts`, `admin.ts`: data types (`Product`, `Order`, `Customer`, `CartItem`)
-- **View** — Page components: `Shop.tsx`, `Product.tsx`, `Bag.tsx`, admin pages
-- **Controller** — React Context providers: `CartContext`, `WishlistContext`, `UIContext`
+**Applied In:**
 
-### 3. 👁️ Observer Pattern
-`Product` and `Payment` act as **Subjects**. `Notification` is the concrete **Observer**:
+* `PaymentFactory`
+* Checkout module
 
-- Admin adds product → `Product.notify()` → `Notification.update()` → `Notification.sendNotification()` → User receives alert
-- Payment completes → `Payment.notify()` → `Notification.update()` → `Notification.sendNotification()` → User receives confirmation
+**Usage:**
 
-### 4. 🔒 Singleton Pattern
-`QueryClient` from TanStack Query is instantiated once and shared across the entire app:
-
-```typescript
-const queryClient = new QueryClient(); // single instance
-// Provided globally via <QueryClientProvider client={queryClient}>
-```
-
-Context providers (`CartContext`, `WishlistContext`, `UIContext`) also follow Singleton behaviour — one instance per app session.
-
-### 5. 🎯 Strategy Pattern
-`Payment` holds a `PaymentStrategy` reference that can be swapped at runtime:
-
-```typescript
-interface PaymentStrategy { pay(amount: number): boolean }
-class CreditCardPayment implements PaymentStrategy { ... }
-class CashPayment        implements PaymentStrategy { ... }
-class EWalletPayment     implements PaymentStrategy { ... }
-```
-
-Product **sorting** in `Shop.tsx` also uses strategy switching:
-`featured` | `price-asc` | `price-desc` | `rating` | `newest`
-
-### 6. 🔄 State Pattern
-`Order` transitions through a state machine managed by `OrderState` concrete classes:
-
-```
-PENDING → PROCESSING → SHIPPED → DELIVERED
-                                      ↓
-             CANCELLED ←←←←←←←←←←←←←
-```
-
-Each state (`PendingState`, `ProcessingState`, `ShippedState`, `DeliveredState`, `CancelledState`) encapsulates `next()` and `cancel()` behaviour.
+* Credit Card Payment
+* Cash Payment
+* E-Wallet Payment
 
 ---
+
+### 🏛️ MVC Pattern
+
+**Purpose:** Separate application data, UI, and business logic for better maintainability.
+
+| Layer          | Location                            |
+| -------------- | ----------------------------------- |
+| **Model**      | `data/products.ts`, `data/admin.ts` |
+| **View**       | `pages/*`, `components/*`           |
+| **Controller** | `context/*`                         |
+
+---
+
+### 👁️ Observer Pattern
+
+**Purpose:** Automatically notify users when important events occur.
+
+**Applied In:**
+
+* Product notification system
+* Payment notification system
+
+**Examples:**
+
+* New product announcements
+* Payment confirmation notifications
+* Order status updates
+
+---
+
+### 🔒 Singleton Pattern
+
+**Purpose:** Ensure a single shared instance is used throughout the application lifecycle.
+
+**Applied In:**
+
+* `QueryClient`
+* `CartContext`
+* `WishlistContext`
+* `UIContext`
+
+---
+
+### 🎯 Strategy Pattern
+
+**Purpose:** Allow different algorithms to be selected and switched at runtime.
+
+**Applied In:**
+
+* Payment processing
+* Product sorting system
+
+**Strategies:**
+
+* Credit Card Strategy
+* Cash Strategy
+* E-Wallet Strategy
+* Featured Sort
+* Price Sort
+* Rating Sort
+* Newest Sort
+
+---
+
+### 🔄 State Pattern
+
+**Purpose:** Manage order status transitions through predefined states.
+
+**Applied In:**
+
+* Order management module
+
+**Order States:**
+
+| State      |
+| ---------- |
+| Pending    |
+| Processing |
+| Shipped    |
+| Delivered  |
+| Cancelled  |
+
+**Flow:**
+
+`Pending → Processing → Shipped → Delivered`
+
+`Pending → Cancelled`
+
 
 ## Project Structure
 
