@@ -1,340 +1,264 @@
-# CLOFIT
+<div align="center">
 
-## Fashion & Sportswear E-Commerce Website
+# 👗 CloFit — Fashion E-Commerce Platform
 
-CLOFIT is a modern e-commerce platform specializing in fashion and sportswear products. The project is developed from a mobile-first UI/UX design and transformed into a responsive web application that provides a seamless shopping experience across desktop, tablet, and mobile devices.
+**A modern streetwear shopping experience built with React + TypeScript**
 
-The system allows customers to browse products, manage shopping carts, place orders, track purchases, and receive notifications about new products and promotions. The architecture is designed following Object-Oriented Design principles and Design Patterns to ensure maintainability, scalability, and future expansion.
+![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?style=flat-square&logo=vite)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38B2AC?style=flat-square&logo=tailwindcss)
 
----
-
-## Project Objectives
-
-* Develop a responsive e-commerce website.
-* Apply Object-Oriented Analysis and Design (OOAD).
-* Implement modern frontend development practices.
-* Provide a user-friendly shopping experience.
-* Prepare the system for backend integration and database deployment.
-* Apply Design Patterns in real-world business scenarios.
+</div>
 
 ---
 
-## Main Features
+## 📋 Table of Contents
 
-### Customer Features
-
-#### Authentication
-
-* User Registration
-* User Login
-* User Logout
-* Account Management
-
-#### Product Management
-
-* Browse Products
-* Search Products
-* View Product Details
-* Filter Products by Category
-* Product Recommendations
-
-#### Shopping Features
-
-* Add Products to Favorites
-* Shopping Cart Management
-* Update Product Quantity
-* Remove Products from Cart
-* Checkout Process
-* Order Confirmation
-
-#### Profile Management
-
-* Personal Information
-* Account Settings
-* Order History
-* Order Tracking
-
-#### Notifications
-
-* New Product Notifications
-* Promotion Notifications
-* Order Status Updates
+- [About](#about)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Design Patterns](#design-patterns)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Team Members](#team-members)
 
 ---
 
-### Administrator Features
+## About
 
-* Manage Products
-* Manage Categories
-* Manage Customer Accounts
-* Manage Orders
-* View Dashboard Statistics
-* Manage Promotions
-* Send Notifications to Customers
+CloFit is a full-featured fashion e-commerce frontend application built as a group project for the **Object-Oriented Analysis & Design** course at **Nông Lâm University, Ho Chi Minh City**.
+
+The platform simulates a real-world streetwear shopping experience with customer-facing pages, an admin dashboard, cart management, wishlist, search, and a multi-payment checkout flow — all implemented with clean OOP design patterns.
 
 ---
 
-## Applied Design Patterns
+## Features
 
-### Strategy Pattern
+### Customer
+| Feature | Description |
+|---------|-------------|
+| 🏠 **Home** | Hero section, featured products, collection highlights |
+| 🛍️ **Shop** | Filter by category, gender, badge; sort by price/rating/newest; price range slider |
+| 🔍 **Search** | Full-text overlay search (Cmd/Ctrl+K shortcut) |
+| 📦 **Product Detail** | Gallery, size selector, color swatches, add-to-bag, wishlist toggle |
+| 🛒 **Bag/Cart** | Quantity controls, promo code (CLOFIT10), shipping calculation, checkout |
+| ❤️ **Wishlist** | Save products, persistent across sessions |
+| 🔐 **Auth** | Sign In / Sign Up pages |
 
-Used to support multiple payment methods.
+### Admin
+| Feature | Description |
+|---------|-------------|
+| 📊 **Dashboard** | Revenue, orders, customers, products KPIs + recent order table |
+| 📦 **Products** | Add, edit, delete products with inline management |
+| 📋 **Orders** | Filter by status, view customer details |
+| 👥 **Customers** | Customer table with spend history and location |
 
-```text
-PaymentStrategy
-├── CreditCardPayment
-├── CashPayment
-└── EWalletPayment
+---
+
+## Tech Stack
+
+### Frontend Core
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **React** | 18.3 | UI framework |
+| **TypeScript** | 5.x | Type safety |
+| **Vite** | 5.x | Build tool & dev server |
+| **React Router** | 6.x | Client-side routing |
+| **TanStack Query** | 5.x | Server state management |
+
+### UI & Styling
+| Technology | Purpose |
+|------------|---------|
+| **Tailwind CSS** | Utility-first styling |
+| **shadcn/ui** | Accessible component library (Radix UI) |
+| **Framer Motion** | Page transitions & animations |
+| **Lucide React** | Icon library |
+| **Recharts** | Admin dashboard charts |
+
+### State & Data
+| Technology | Purpose |
+|------------|---------|
+| **React Context API** | Global state (Cart, Wishlist, UI) |
+| **localStorage** | Cart & wishlist persistence |
+| **Sonner / Toaster** | Toast notifications |
+| **Zod** | Form validation schema |
+| **React Hook Form** | Form state management |
+
+---
+
+## Design Patterns
+
+The application is architectured around **6 core design patterns** from OOP:
+
+### 1. 🏭 Factory Pattern
+`PaymentFactory` creates payment strategy objects at runtime based on the payment type string.
+
+```typescript
+// PaymentFactory decides which strategy to instantiate
+class PaymentFactory {
+  static createPayment(type: 'credit' | 'cash' | 'ewallet'): PaymentStrategy
+}
 ```
 
-Benefits:
+### 2. 🏛️ MVC Pattern
+The entire application follows a clear Model-View-Controller separation:
 
-* Easy to add new payment methods.
-* Follows Open/Closed Principle.
-* Reduces code duplication.
+- **Model** — `products.ts`, `admin.ts`: data types (`Product`, `Order`, `Customer`, `CartItem`)
+- **View** — Page components: `Shop.tsx`, `Product.tsx`, `Bag.tsx`, admin pages
+- **Controller** — React Context providers: `CartContext`, `WishlistContext`, `UIContext`
 
----
+### 3. 👁️ Observer Pattern
+`Product` and `Payment` act as **Subjects**. `Notification` is the concrete **Observer**:
 
-### Factory Pattern
+- Admin adds product → `Product.notify()` → `Notification.update()` → `Notification.sendNotification()` → User receives alert
+- Payment completes → `Payment.notify()` → `Notification.update()` → `Notification.sendNotification()` → User receives confirmation
 
-Used to create payment strategy objects dynamically.
+### 4. 🔒 Singleton Pattern
+`QueryClient` from TanStack Query is instantiated once and shared across the entire app:
 
-```text
-PaymentFactory
-└── createPayment(type)
+```typescript
+const queryClient = new QueryClient(); // single instance
+// Provided globally via <QueryClientProvider client={queryClient}>
 ```
 
-Benefits:
+Context providers (`CartContext`, `WishlistContext`, `UIContext`) also follow Singleton behaviour — one instance per app session.
 
-* Encapsulates object creation.
-* Reduces coupling between components.
+### 5. 🎯 Strategy Pattern
+`Payment` holds a `PaymentStrategy` reference that can be swapped at runtime:
 
----
-
-### Observer Pattern
-
-Used for notification services.
-
-Scenario:
-
-* Admin adds a new product.
-* Product Catalog updates.
-* Users subscribed to notifications receive updates automatically.
-
-```text
-Admin
-   ↓
-Product Catalog (Subject)
-   ↓
-notifyObservers()
-   ↓
-User (Observer)
+```typescript
+interface PaymentStrategy { pay(amount: number): boolean }
+class CreditCardPayment implements PaymentStrategy { ... }
+class CashPayment        implements PaymentStrategy { ... }
+class EWalletPayment     implements PaymentStrategy { ... }
 ```
 
-Benefits:
+Product **sorting** in `Shop.tsx` also uses strategy switching:
+`featured` | `price-asc` | `price-desc` | `rating` | `newest`
 
-* Loose coupling.
-* Real-time notification mechanism.
+### 6. 🔄 State Pattern
+`Order` transitions through a state machine managed by `OrderState` concrete classes:
 
----
-
-### Singleton Pattern
-
-Used for system configuration management.
-
-```text
-SystemConfig
-└── getInstance()
+```
+PENDING → PROCESSING → SHIPPED → DELIVERED
+                                      ↓
+             CANCELLED ←←←←←←←←←←←←←
 ```
 
-Benefits:
-
-* Ensures only one configuration instance exists.
-* Centralized system settings management.
-
----
-
-## Technology Stack
-
-### Frontend
-
-* React
-* TypeScript
-* Tailwind CSS
-* React Router
-* Vite
-
-### Development Tools
-
-* Git
-* GitHub
-* VS Code
-* Figma
-* Postman
+Each state (`PendingState`, `ProcessingState`, `ShippedState`, `DeliveredState`, `CancelledState`) encapsulates `next()` and `cancel()` behaviour.
 
 ---
 
 ## Project Structure
 
-```bash
-src/
-├── assets/          # Images, icons, static resources
-├── components/      # Reusable UI components
-├── data/            # Mock data
-├── hooks/           # Custom React hooks
-├── layouts/         # Application layouts
-├── pages/           # Application pages
-├── routes/          # Route configuration
-├── services/        # API services
-├── types/           # TypeScript interfaces
-├── utils/           # Utility functions
-└── App.tsx
 ```
+src/
+├── assets/                 # Static images (product photos)
+├── components/
+│   ├── admin/              # AdminLayout
+│   ├── clofit/             # Navbar, Footer, ProductCard, CartDrawer,
+│   │                       #   Layout, SearchOverlay, MobileMenu, Logo
+│   └── ui/                 # shadcn/ui primitives (button, dialog, etc.)
+├── context/
+│   ├── CartContext.tsx      # Cart state + operations (Controller)
+│   ├── WishlistContext.tsx  # Wishlist state (Controller)
+│   └── UIContext.tsx        # UI overlays state (Controller)
+├── data/
+│   ├── products.ts          # Product catalogue + CRUD helpers (Model)
+│   └── admin.ts             # Orders, Customers mock data (Model)
+├── hooks/
+│   ├── use-mobile.tsx       # Responsive breakpoint hook
+│   └── use-toast.ts         # Toast notification hook
+├── lib/
+│   └── utils.ts             # Tailwind class merge utility
+├── pages/
+│   ├── Index.tsx            # Home page
+│   ├── Shop.tsx             # Product listing + filters
+│   ├── Product.tsx          # Product detail
+│   ├── Bag.tsx              # Cart / checkout
+│   ├── Wishlist.tsx         # Saved items
+│   ├── SignIn.tsx           # Login
+│   ├── SignUp.tsx           # Register
+│   └── admin/
+│       ├── Dashboard.tsx    # Admin KPI dashboard
+│       ├── AdminProducts.tsx
+│       ├── AdminOrders.tsx
+│       └── AdminCustomers.tsx
+├── test/
+│   └── example.test.ts      # Unit test setup
+├── App.tsx                  # Router + global providers
+└── main.tsx                 # Entry point
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+- **Node.js** ≥ 18 or **Bun** ≥ 1.0
+- npm / yarn / bun
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/nhom18/clofit-ecommerce.git
+cd clofit-ecommerce
+
+# Install dependencies (pick one)
+npm install
+# or
+bun install
+
+# Start development server
+npm run dev
+# or
+bun dev
+```
+
+The app runs at **http://localhost:8080**
+
+### Build for Production
+
+```bash
+npm run build
+npm run preview
+```
+
+### Admin Access
+
+Navigate to `/admin` to access the admin dashboard (no login required in demo mode).
+
+### Promo Code
+
+Enter **`CLOFIT10`** in the bag/cart page for 10% off.
 
 ---
 
 ## Team Members
 
-| Student ID | Full Name             | Responsibility                   |
-| ---------- | --------------------- | -------------------------------- |
-| 24130270   | Trần Nguyễn Anh Tài   | Team Leader & Frontend Developer |
-| 24130366   | Đặng Anh Vĩ           | Database Developer               |
-| 19130113   | Trương Huỳnh Anh Kiệt | Frontend Developer               |
-| 24130375   | Nguyễn Quý Vinh       | Backend Developer                |
-| 24130037   | Nguyễn Công Danh      | UI/UX Designer                   |
+| Student ID | Full Name | Role |
+|-----------|-----------|------|
+| **24130270** | Trần Nguyễn Anh Tài | Team Leader & Frontend Developer |
+| **24130366** | Đặng Anh Vĩ | Database Developer |
+| **19130113** | Trương Huỳnh Anh Kiệt | Frontend Developer |
+| **24130375** | Nguyễn Quý Vinh | Backend Developer |
+| **24130037** | Nguyễn Công Danh | UI/UX Designer |
 
 ---
 
-## Task Distribution
+## Course Information
 
-### Trần Nguyễn Anh Tài (Team Leader)
-
-* Project Planning
-* Team Coordination
-* Frontend Development
-* React Components
-* Routing System
-* Integration & Deployment
-* Use Case Diagram
-
-### Đặng Anh Vĩ
-
-* Database Design
-* ERD Diagram
-* Data Modeling
-* Database Integration
-* Query Optimization
-
-### Trương Huỳnh Anh Kiệt
-
-* Frontend Development
-* Responsive Layout
-* UI Components
-* State Management
-* Frontend Testing
-* Documentation Support
-
-### Nguyễn Quý Vinh
-
-* Backend Development
-* RESTful API Development
-* Authentication & Authorization
-* Business Logic Implementation
-* Class Diagram
-* Sequence Diagram
-
-### Nguyễn Công Danh
-
-* UI/UX Design
-* Figma Prototype
-* Design System
-* User Experience Evaluation
-* Interface Design
+| | |
+|--|--|
+| **University** | Nông Lâm University, Ho Chi Minh City |
+| **Course** | Object-Oriented Analysis & Design |
+| **Group** | Nhóm 18 |
+| **Academic Year** | 2025 – 2026 |
 
 ---
 
-## Installation Guide
-
-### Clone Repository
-
-```bash
-git clone https://github.com/tai3042006/E-Commerce-Website.git
-```
-
-### Install Dependencies
-
-```bash
-npm install
-```
-
-### Run Development Server
-
-```bash
-npm run dev
-```
-
-### Build Production Version
-
-```bash
-npm run build
-```
-
-### Preview Production Build
-
-```bash
-npm run preview
-```
-
----
-
-## Future Enhancements
-
-### Backend Integration
-
-* RESTful API
-* Spring Boot / ExpressJS
-* JWT Authentication
-
-### Database
-
-* MySQL
-* PostgreSQL
-
-### E-Commerce Features
-
-* Product Management
-* Inventory Management
-* Order Management
-* Customer Management
-* Review & Rating System
-
-### Payment Integration
-
-* VNPay
-* MoMo
-* PayPal
-* Stripe
-
-### Analytics & Reporting
-
-* Sales Reports
-* Customer Analytics
-* Product Performance Statistics
-
----
-
-## Academic Information
-
-**Course:** Object-Oriented Design / Software Engineering
-
-**Project Type:** Team Project
-
-**Institution:** Nong Lam University (NLU)
-
-**Academic Year:** 2025 - 2026
-
----
-
-## License
-
-This project is developed for educational and academic purposes only.
+<div align="center">
+Made with ❤️ by Nhóm 18 — Nông Lâm University
+</div>
