@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUI } from "@/context/UIContext";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/controllers/CartController";
 
 export const CartDrawer = () => {
   const { cartOpen, closeCart } = useUI();

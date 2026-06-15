@@ -7,7 +7,6 @@ import teeEye from "@/assets/product-tee-eye.jpg";
 export type ProductCategory =
   | "hoodies"
   | "tees"
-  | "outerwear"
   | "shoes"
   | "accessories"
   | "pants";
@@ -156,31 +155,6 @@ export const products: Product[] = [
     description: "Boxy crop with rolled sleeves. Designed for layering or solo.",
   },
   {
-    id: "field-overshirt",
-    name: "Field Overshirt",
-    tagline: "Brushed twill, double-pocket",
-    price: 128,
-    oldPrice: 168,
-    image: u("photo-1551028719-00167b16eac5"),
-    hoverImage: u("photo-1591047139829-d91aecb6caea"),
-    category: "outerwear", gender: "men", rating: 4.8, reviews: 318,
-    badge: "sale",
-    colors: ["#3f3f2f", "#1a1a1a"], sizes, inStock: true,
-    description: "Heavy brushed twill overshirt with horn buttons and dual chest pockets. Cut for layering.",
-  },
-  {
-    id: "puffer-alpine",
-    name: "Alpine Puffer",
-    tagline: "Recycled down, matte shell",
-    price: 248,
-    image: u("photo-1544022613-e87ca75a784a"),
-    hoverImage: u("photo-1591047139829-d91aecb6caea"),
-    category: "outerwear", gender: "unisex", rating: 4.9, reviews: 654,
-    badge: "bestseller",
-    colors: ["#1a1a1a", "#0f1b3d"], sizes, inStock: true,
-    description: "Matte-shell puffer filled with recycled down. Built for cold streets.",
-  },
-  {
     id: "runner-low",
     name: "Runner Low",
     tagline: "Lightweight mesh runner",
@@ -277,29 +251,6 @@ export const products: Product[] = [
     description: "Fine-gauge merino rib beanie with folded cuff.",
   },
   {
-    id: "track-jacket",
-    name: "Track Jacket",
-    tagline: "Retro shell",
-    price: 108,
-    image: u("photo-1591047139829-d91aecb6caea"),
-    hoverImage: u("photo-1551028719-00167b16eac5"),
-    category: "outerwear", gender: "men", rating: 4.6, reviews: 372,
-    colors: ["#1a1a1a", "#f5f5f5"], sizes, inStock: true,
-    description: "Lightweight nylon track jacket with contrast piping.",
-  },
-  {
-    id: "midi-dress",
-    name: "Tailored Midi",
-    tagline: "Crepe midi dress",
-    price: 158,
-    image: u("photo-1572804013309-59a88b7e92f1"),
-    hoverImage: u("photo-1496217590455-aa63a8350eea"),
-    category: "outerwear", gender: "women", rating: 4.8, reviews: 211,
-    badge: "new",
-    colors: ["#1a1a1a", "#7d2424"], sizes, inStock: true,
-    description: "Bias-cut midi in fluid crepe. Designed for movement.",
-  },
-  {
     id: "knit-cardigan",
     name: "Heavy Knit Cardigan",
     tagline: "Lambswool blend",
@@ -318,7 +269,6 @@ export const categories: { id: ProductCategory | "all"; label: string }[] = [
   { id: "all", label: "All" },
   { id: "hoodies", label: "Hoodies" },
   { id: "tees", label: "Tees" },
-  { id: "outerwear", label: "Outerwear" },
   { id: "shoes", label: "Shoes" },
   { id: "pants", label: "Pants" },
   { id: "accessories", label: "Accessories" },

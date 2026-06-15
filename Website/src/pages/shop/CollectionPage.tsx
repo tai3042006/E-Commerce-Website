@@ -25,10 +25,19 @@ export interface CollectionConfig {
   crumbLabel: string;
   /** Base filter applied before user filters */
   baseFilter: (p: Product) => boolean;
+  /** Whether to show subcategory chips instead of category chips */
+  showSubcategoryChips?: boolean;
+  /** Subcategory options to show when showSubcategoryChips is true */
+  subcategoryOptions?: Array<{ value: string; label: string }>;
 }
 
 interface Props {
   config: CollectionConfig;
+}
+
+interface SubcategoryOption {
+  value: string;
+  label: string;
 }
 
 const CollectionPage = ({ config }: Props) => {
@@ -37,12 +46,79 @@ const CollectionPage = ({ config }: Props) => {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [priceMax, setPriceMax] = useState(300);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [catFilter, setCatFilter] = useState<ProductCategory | "all">("all");
+  const [subcategoryFilter, setSubcategoryFilter] = useState<string>("");
 
   const badgeParam = params.get("badge");
 
   const filtered = useMemo<Product[]>(() => {
     let list = products.filter(config.baseFilter);
     if (badgeParam) list = list.filter((p) => p.badge === badgeParam);
+
+    // Subcategory filtering (when in subcategory mode)
+    if (
+      config.showSubcategoryChips &&
+      config.subcategoryOptions &&
+      subcategoryFilter
+    ) {
+      list = list.filter((p) => {
+        // Implement subcategory filtering logic similar to AllProducts.tsx
+        const lowerName = (p.name + p.tagline + (p.description || "")).toLowerCase();
+        switch (subcategoryFilter) {
+          case "bestseller":
+            return p.badge === "bestseller";
+          case "new":
+            return p.badge === "new";
+          case "oversized":
+            return (
+              lowerName.includes("oversized") ||
+              lowerName.includes("boxy")
+            );
+          case "zip":
+            return (
+              lowerName.includes("zip") ||
+              lowerName.includes("zipped")
+            );
+          case "graphic":
+            return lowerName.includes("graphic");
+          case "boxy":
+            return lowerName.includes("boxy");
+          case "long-sleeve":
+            return (
+              lowerName.includes("long sleeve") ||
+              lowerName.includes("longsleeve")
+            );
+          case "runners":
+            return lowerName.includes("runner");
+          case "court":
+            return lowerName.includes("court");
+          case "trail":
+            return lowerName.includes("trail");
+          case "slip-ons":
+            return lowerName.includes("slip");
+          case "basic":
+            // Basic tees - no specific markings, just plain
+            return !(
+              p.badge === "bestseller" ||
+              p.badge === "new" ||
+              lowerName.includes("graphic") ||
+              lowerName.includes("boxy") ||
+              lowerName.includes("long sleeve") ||
+              lowerName.includes("longsleeve") ||
+              lowerName.includes("oversized") ||
+              lowerName.includes("zip") ||
+              lowerName.includes("zipped") ||
+              lowerName.includes("runner") ||
+              lowerName.includes("court") ||
+              lowerName.includes("trail") ||
+              lowerName.includes("slip")
+            );
+          default:
+            return true;
+        }
+      });
+    }
+
     list = list.filter((p) => p.price <= priceMax);
     switch (sort) {
       case "price-asc":
@@ -62,9 +138,11 @@ const CollectionPage = ({ config }: Props) => {
         break;
     }
     return list;
-  }, [config, badgeParam, sort, priceMax]);
+  }, [config, badgeParam, sort, priceMax, subcategoryFilter]);
 
-  const hasActiveFilters = !!(badgeParam || priceMax < 300);
+  const hasActiveFilters = !!(badgeParam || priceMax < 300 || subcategoryFilter);
+
+  // catFilter already declared above
 
   // Subcategory chips based on what's in this collection
   const presentCategories = useMemo(() => {
@@ -72,12 +150,16 @@ const CollectionPage = ({ config }: Props) => {
     return Array.from(cats) as ProductCategory[];
   }, [config]);
 
-  const [catFilter, setCatFilter] = useState<ProductCategory | "all">("all");
-
   const finalFiltered = useMemo(() => {
-    if (catFilter === "all") return filtered;
-    return filtered.filter((p) => p.category === catFilter);
-  }, [filtered, catFilter]);
+    if (config.showSubcategoryChips) {
+      // In subcategory mode, subcategoryFilter is already applied in filtered
+      return filtered;
+    } else {
+      // In category mode, filter by category
+      if (catFilter === "all") return filtered;
+      return filtered.filter((p) => p.category === catFilter);
+    }
+  }, [filtered, catFilter, config.showSubcategoryChips]);
 
   return (
     <Layout>
@@ -106,37 +188,73 @@ const CollectionPage = ({ config }: Props) => {
           </div>
         </div>
 
-        {/* Category sub-chips */}
-        {presentCategories.length > 1 && (
+        {/* Category chips or Subcategory chips */}
+        {config.showSubcategoryChips ? (
+          {/* Subcategory chips */}
           <div className="mt-6 -mx-5 overflow-x-auto px-5 no-scrollbar md:mx-0 md:px-0">
             <div className="flex gap-2 whitespace-nowrap">
               <button
-                onClick={() => setCatFilter("all")}
+                onClick={() => setSubcategoryFilter("")}
                 className={`rounded-pill border px-4 py-2 text-sm font-medium transition-colors ${
-                  catFilter === "all"
+                  subcategoryFilter === ""
                     ? "border-foreground bg-foreground text-background"
                     : "border-border hover:bg-secondary"
                 }`}
               >
                 All
               </button>
-              {presentCategories.map((cat) => (
+              {config.subcategoryOptions?.map((option) => (
                 <button
-                  key={cat}
+                  key={option.value}
                   onClick={() =>
-                    setCatFilter(catFilter === cat ? "all" : cat)
+                    setSubcategoryFilter(
+                      subcategoryFilter === option.value ? "" : option.value
+                    )
                   }
                   className={`rounded-pill border px-4 py-2 text-sm font-medium transition-colors capitalize ${
-                    catFilter === cat
+                    subcategoryFilter === option.value
                       ? "border-foreground bg-foreground text-background"
                       : "border-border hover:bg-secondary"
                   }`}
                 >
-                  {cat}
+                  {option.label}
                 </button>
               ))}
             </div>
           </div>
+        ) : (
+          {/* Category chips (original behavior) */}
+          {presentCategories.length > 1 && (
+            <div className="mt-6 -mx-5 overflow-x-auto px-5 no-scrollbar md:mx-0 md:px-0">
+              <div className="flex gap-2 whitespace-nowrap">
+                <button
+                  onClick={() => setCatFilter("all")}
+                  className={`rounded-pill border px-4 py-2 text-sm font-medium transition-colors ${
+                    catFilter === "all"
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border hover:bg-secondary"
+                  }`}
+                >
+                  All
+                </button>
+                {presentCategories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() =>
+                        setCatFilter(catFilter === cat ? "all" : cat)
+                    }
+                    className={`rounded-pill border px-4 py-2 text-sm font-medium transition-colors capitalize ${
+                      catFilter === cat
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border hover:bg-secondary"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         )}
 
         {/* Toolbar */}
@@ -378,10 +496,55 @@ export const WomenCollection = () => (
 export const ShoesCollection = () => (
   <CollectionPage
     config={{
-      title: "Shoes",
+      title: "Shoes Collection",
       subtitle: "Runners, Court, Trail & Slip-ons",
       crumbLabel: "Shoes",
       baseFilter: (p) => p.category === "shoes",
+      showSubcategoryChips: true,
+      subcategoryOptions: [
+        { value: "bestseller", label: "Bestsellers" },
+        { value: "new", label: "New Arrivals" },
+        { value: "runners", label: "Running" },
+        { value: "court", label: "Casual" },
+        { value: "high-top", label: "High-top" },
+      ],
+    }}
+  />
+);
+
+export const HoodiesCollection = () => (
+  <CollectionPage
+    config={{
+      title: "Hoodies Collection",
+      subtitle: "Premium hoodies for every occasion",
+      crumbLabel: "Hoodies",
+      baseFilter: (p) => p.category === "hoodies",
+      showSubcategoryChips: true,
+      subcategoryOptions: [
+        { value: "bestseller", label: "Bestsellers" },
+        { value: "new", label: "New Arrivals" },
+        { value: "oversized", label: "Oversized" },
+        { value: "zip", label: "Zip-up" },
+      ],
+    }}
+  />
+);
+
+export const TeesCollection = () => (
+  <CollectionPage
+    config={{
+      title: "Tees Collection",
+      subtitle: "Essential tees for everyday wear",
+      crumbLabel: "Tees",
+      baseFilter: (p) => p.category === "tees",
+      showSubcategoryChips: true,
+      subcategoryOptions: [
+        { value: "bestseller", label: "Bestsellers" },
+        { value: "new", label: "New Arrivals" },
+        { value: "graphic", label: "Graphic" },
+        { value: "boxy", label: "Oversized" },
+        { value: "basic", label: "Basic" },
+      ],
     }}
   />
 );
@@ -389,7 +552,7 @@ export const ShoesCollection = () => (
 export const AccessoriesCollection = () => (
   <CollectionPage
     config={{
-      title: "Accessories",
+      title: "Accessories Collection",
       subtitle: "Bags, Caps, Beanies & more",
       crumbLabel: "Accessories",
       baseFilter: (p) => p.category === "accessories",

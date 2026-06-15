@@ -12,7 +12,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { WishlistProvider } from "./context/WishlistContext";
-import { CartProvider } from "./context/CartContext";
+import { CartProvider } from "./controllers/CartController";
+import { ProductProvider } from "@/controllers/ProductController";
 import { UIProvider } from "./context/UIContext";
 import { ScrollToTop } from "./components/clofit/ScrollToTop";
 import {
@@ -44,6 +45,16 @@ const ShoesCollection = lazy(() =>
 const AccessoriesCollection = lazy(() =>
   import("./pages/shop/CollectionPage").then((m) => ({
     default: m.AccessoriesCollection,
+  }))
+);
+const HoodiesCollection = lazy(() =>
+  import("./pages/shop/CollectionPage").then((m) => ({
+    default: m.HoodiesCollection,
+  }))
+);
+const TeesCollection = lazy(() =>
+  import("./pages/shop/CollectionPage").then((m) => ({
+    default: m.TeesCollection,
   }))
 );
 
@@ -128,6 +139,26 @@ const AnimatedRoutes = () => {
               <Suspense fallback={<PageSkeleton />}>
                 <Page>
                   <WomenCollection />
+                </Page>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/shop/hoodies"
+            element={
+              <Suspense fallback={<PageSkeleton />}>
+                <Page>
+                  <HoodiesCollection />
+                </Page>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/shop/tees"
+            element={
+              <Suspense fallback={<PageSkeleton />}>
+                <Page>
+                  <TeesCollection />
                 </Page>
               </Suspense>
             }
@@ -294,7 +325,9 @@ const App = () => (
         <UIProvider>
           <WishlistProvider>
             <CartProvider>
-              <AnimatedRoutes />
+              <ProductProvider>
+                <AnimatedRoutes />
+              </ProductProvider>
             </CartProvider>
           </WishlistProvider>
         </UIProvider>

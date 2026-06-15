@@ -4,7 +4,7 @@ import { Product } from "@/data/products";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useWishlist } from "@/context/WishlistContext";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/controllers/CartController";
 import { toast } from "sonner";
 
 const badgeStyles: Record<string, string> = {

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/clofit/Layout";
 import { getProduct, products } from "@/data/products";
 import { ProductCard } from "@/components/clofit/ProductCard";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/controllers/CartController";
 import { useWishlist } from "@/context/WishlistContext";
 import { useUI } from "@/context/UIContext";
 import { toast } from "sonner";

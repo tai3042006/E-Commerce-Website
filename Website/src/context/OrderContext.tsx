@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
-import { CartItem } from "./CartContext";
+import { CartItem } from "@/models/Cart";
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 
