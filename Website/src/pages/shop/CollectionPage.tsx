@@ -190,7 +190,6 @@ const CollectionPage = ({ config }: Props) => {
 
         {/* Category chips or Subcategory chips */}
         {config.showSubcategoryChips ? (
-          {/* Subcategory chips */}
           <div className="mt-6 -mx-5 overflow-x-auto px-5 no-scrollbar md:mx-0 md:px-0">
             <div className="flex gap-2 whitespace-nowrap">
               <button
@@ -223,38 +222,40 @@ const CollectionPage = ({ config }: Props) => {
             </div>
           </div>
         ) : (
-          {/* Category chips (original behavior) */}
-          {presentCategories.length > 1 && (
-            <div className="mt-6 -mx-5 overflow-x-auto px-5 no-scrollbar md:mx-0 md:px-0">
-              <div className="flex gap-2 whitespace-nowrap">
-                <button
-                  onClick={() => setCatFilter("all")}
-                  className={`rounded-pill border px-4 py-2 text-sm font-medium transition-colors ${
-                    catFilter === "all"
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border hover:bg-secondary"
-                  }`}
-                >
-                  All
-                </button>
-                {presentCategories.map((cat) => (
+          <>
+            {/* Category chips (original behavior) */}
+            {presentCategories.length > 1 && (
+              <div className="mt-6 -mx-5 overflow-x-auto px-5 no-scrollbar md:mx-0 md:px-0">
+                <div className="flex gap-2 whitespace-nowrap">
                   <button
-                    key={cat}
-                    onClick={() =>
-                        setCatFilter(catFilter === cat ? "all" : cat)
-                    }
-                    className={`rounded-pill border px-4 py-2 text-sm font-medium transition-colors capitalize ${
-                      catFilter === cat
+                    onClick={() => setCatFilter("all")}
+                    className={`rounded-pill border px-4 py-2 text-sm font-medium transition-colors ${
+                      catFilter === "all"
                         ? "border-foreground bg-foreground text-background"
                         : "border-border hover:bg-secondary"
                     }`}
                   >
-                    {cat}
+                    All
                   </button>
-                ))}
+                  {presentCategories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() =>
+                        setCatFilter(catFilter === cat ? "all" : cat)
+                      }
+                      className={`rounded-pill border px-4 py-2 text-sm font-medium transition-colors capitalize ${
+                        catFilter === cat
+                          ? "border-foreground bg-foreground text-background"
+                          : "border-border hover:bg-secondary"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </>
         )}
 
         {/* Toolbar */}
