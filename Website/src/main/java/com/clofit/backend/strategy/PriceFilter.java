@@ -1,6 +1,6 @@
 package com.clofit.backend.strategy;
 
-import com.clofit.model.Product;
+import com.clofit.backend.model.Product;
 import java.util.ArrayList;
 import java.util.List;
 

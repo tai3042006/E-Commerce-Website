@@ -1,50 +1,76 @@
 package com.clofit.backend.MVC;
 
-import com.store.models.Product;
-import com.store.services.ProductCatalog;
-import com.store.strategy.ProductFilterContext;
-import com.store.strategy.FilterStrategy;
+import com.clofit.backend.model.Category;
+import com.clofit.backend.model.Product;
+import com.clofit.backend.factory.IProductFactory;
+import com.clofit.backend.singleton.CartService;
+
 import java.util.List;
 
 public class ProductController {
-    private ProductCatalog catalog;
-    private ProductView view;
+
+    private ProductCatalog productCatalog;
+    private ProductView productView;
     private ProductFilterContext filterContext;
+    private IProductFactory productFactory;
 
-    public ProductController(ProductView view) {
-        this.catalog = ProductCatalog.getInstance();
-        this.view = view;
-        this.filterContext = new ProductFilterContext();
+    public ProductController(ProductCatalog productCatalog, ProductView productView,
+            ProductFilterContext filterContext, IProductFactory productFactory) {
+        this.productCatalog = productCatalog;
+        this.productView = productView;
+        this.filterContext = filterContext;
+        this.productFactory = productFactory;
     }
 
-    public void addProduct(String name, double price, int stock, com.store.models.Category category) {
-        com.store.factory.ProductFactory factory = new com.store.factory.ProductFactory();
-        Product p = factory.createProduct(name, price, stock, category);
-        catalog.addProduct(p);
+    public void addProduct(String name, double price, int stock, String category) {
+        String id = "P" + (productCatalog.getAllProducts().size() + 1);
+        Category cat = new Category();
+        cat.setName(category);
+        Product product = productFactory.createProduct(id, name, price, stock, cat);
+        productCatalog.addProduct(product);
+        productView.displayProducts(productCatalog.getAllProducts(), id);
     }
 
-    public void setFilterStrategy(FilterStrategy strategy) {
+    public void removeProduct(String id) {
+        productCatalog.removeProduct(id);
+        productView.displayMessage("Product " + id + " removed.");
+    }
+
+    public List<Product> getFilterProducts() {
+        List<Product> filtered = filterContext.executeFilter(productCatalog.getAllProducts());
+        productView.displayProducts(filtered, filterContext.getCurrentStrategyName());
+        return filtered;
+    }
+
+    public void setFilterStrategy(IFilterStrategy strategy) {
         filterContext.setStrategy(strategy);
-        view.displayMessage("Đã bật bộ lọc: " + filterContext.getCurrentStrategyName());
     }
 
-    public void displayAvailableProducts() {
-        List<Product> all = catalog.getProducts();
-        List<Product> filtered = filterContext.executeFilter(all);
-        view.displayProducts(filtered, filterContext.getCurrentStrategyName());
+    public Product addProductWithDetails(String name, double price, int stock,
+            String imageUrl, double rating,
+            Category category, String description) {
+        String id = "P" + (productCatalog.getAllProducts().size() + 1);
+        Product product = productFactory.createProduct(id, name, price, stock, category);
+        product.setDescription(description);
+        product.setImageUrl(imageUrl);
+        product.setRating(rating);
+        productCatalog.addProduct(product);
+        return product;
     }
 
-    public void searchProducts(String keyword) {
-        List<Product> matches = catalog.searchByKey(keyword);
-        view.displayProducts(matches, "Tìm kiếm từ khoá: " + keyword);
+    public List<Product> searchProducts(String keyword) {
+        List<Product> results = productCatalog.searchByKeyword(keyword);
+        productView.displayProducts(results, "Search: '" + keyword + "'");
+        return results;
     }
 
-    public void showProductDetail(String id) {
-        Product p = catalog.getProductById(id);
+    public Product getProductById(String id) {
+        Product p = productCatalog.getProductById(id);
         if (p != null) {
-            view.displayProductDetail(p);
+            productView.displayProductDetail(p);
         } else {
-            view.displayMessage("Lỗi: Không tìm thấy trang phục có mã số này!");
+            productView.displayMessage("Product with ID '" + id + "' not found.");
         }
+        return p;
     }
 }

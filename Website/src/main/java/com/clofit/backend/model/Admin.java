@@ -1,5 +1,4 @@
-package com.clofit.model;
-
+package com.clofit.backend.model;
 
 public class Admin extends User {
     private int adminLevel;
@@ -23,6 +22,11 @@ public class Admin extends User {
         System.out.println(">> Admin [" + name + "] đã đăng xuất an toàn.");
     }
 
-    public int getAdminLevel() { return adminLevel; }
-    public void setAdminLevel(int adminLevel) { this.adminLevel = adminLevel; }
+    public int getAdminLevel() {
+        return adminLevel;
+    }
+
+    public void setAdminLevel(int adminLevel) {
+        this.adminLevel = adminLevel;
+    }
 }

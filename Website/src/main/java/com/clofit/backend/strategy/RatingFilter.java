@@ -3,9 +3,9 @@ package com.clofit.backend.strategy;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.clofit.model.Product;
+import com.clofit.backend.model.Product;
 
-public class RatingFilter  implements IFilterStrategy {
+public class RatingFilter implements IFilterStrategy {
 
     private double minRating;
 

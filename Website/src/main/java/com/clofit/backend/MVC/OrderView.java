@@ -1,52 +1,73 @@
 package com.clofit.backend.MVC;
 
-import com.store.models.Order;
-import com.store.models.OrderItem;
+import com.clofit.backend.model.Order;
+import com.clofit.backend.model.OrderItem;
+
 import java.util.List;
 
 public class OrderView implements IView {
-    
+
     @Override
-    public void render() {}
+    public void render() {
+    }
 
     public void displayOrder(Order order) {
-        System.out.println("
-============ XÁC NHẬN HÓA ĐƠN ============");
-        System.out.println("Mã Đơn hàng: " + order.getId());
-        System.out.println("Ngày phát hóa: " + order.getState().getStatus());
-        System.out.println("Trạng thái hiện tại: " + order.getState().getStatus().toUpperCase());
-        System.out.println("----------------------------------------------");
-        System.out.println("Nội dung dòng vệt hàng:");
+
+        System.out.println("\n============ ORDER CONFIRMATION ============");
+        System.out.println("Order ID: " + order.getId());
+        System.out.println(
+                "Current Status: "
+                        + order.getState().getStatus()
+                        + " | Last Updated: "
+                        + order.getState());
+
+        System.out.println("--------------------------------------------");
+        System.out.println("Order Items:");
+
         for (OrderItem item : order.getItems()) {
-            System.out.printf("  + %20s | Đơn giá: %.1f VND | SL: %d | Th.Tiền: %.1f VND
-",
-                    item.getProduct().getName(), item.getPrice(), item.getQuantity(), item.getSubTotal());
+
+            System.out.printf(
+                    " + %-20s | Unit Price: %.2f VND | Qty: %d | Subtotal: %.2f VND%n",
+                    item.getProduct().getName(),
+                    item.getPrice(),
+                    item.getQuantity(),
+                    item.getSubTotal());
         }
-        System.out.println("----------------------------------------------");
-        System.out.printf("TỔNG THANH TOÁN: %.1f VND
-", order.getTotal());
-        System.out.println("==============================================
-");
+
+        System.out.println("--------------------------------------------");
+
+        System.out.printf(
+                "TOTAL AMOUNT: %.2f VND%n",
+                order.getTotal());
+
+        System.out.println("============================================\n");
     }
 
     public void displayOrdersList(List<Order> orders) {
-        System.out.println("
-============ LỊCH SỬ ĐƠN HÀNG TOÀN CỦA HÀNG ============");
+
+        System.out.println("\n============== ORDER HISTORY ==============");
+
         if (orders.isEmpty()) {
-            System.out.println("(Không có đơn hàng nào trên hệ thống)");
+
+            System.out.println("No orders found.");
+
         } else {
-            for (Order o : orders) {
-                System.out.printf("Đơn #%s | Ngày mua: %s | Giá trị: %.1f VND | Trạng thái: [%s]
-",
-                        o.getId(), o.getId().substring(4), o.getTotal(), o.getState().getStatus());
+
+            for (Order order : orders) {
+
+                System.out.printf(
+                        "Order #%s | Total: %.2f VND | Status: [%s]%n",
+                        order.getId(),
+                        order.getTotal(),
+                        order.getState().getStatus());
             }
         }
-        System.out.println("=======================================================
-");
+
+        System.out.println("===========================================\n");
     }
 
     @Override
     public void displayMessage(String msg) {
-        System.out.println("[Phần Mềm Đơn Hàng]: " + msg);
+        System.out.println("[Order System] " + msg);
     }
 }

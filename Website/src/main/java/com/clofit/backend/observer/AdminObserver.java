@@ -1,6 +1,6 @@
 package com.clofit.backend.observer;
 
-import com.clofit.backend.MVC.Admin;
+import com.clofit.backend.model.Admin;
 
 public class AdminObserver implements IObserver {
 

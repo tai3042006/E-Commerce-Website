@@ -1,6 +1,7 @@
 package com.clofit.backend.strategy;
 
-import com.clofit.model.Product;
+import com.clofit.backend.model.Product;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,11 +16,12 @@ public class CategoryFilter implements IFilterStrategy {
     @Override
     public List<Product> filter(List<Product> products) {
         List<Product> result = new ArrayList<>();
-        if (products == null) {
+        if (products == null)
             return result;
-        }
         for (Product product : products) {
-            if (product != null && targetCategory.equals(product.getCategory())) {
+            if (product != null
+                    && product.getCategory() != null
+                    && targetCategory.equals(product.getCategory().getName())) {
                 result.add(product);
             }
         }

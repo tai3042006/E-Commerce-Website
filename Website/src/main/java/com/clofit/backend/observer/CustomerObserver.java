@@ -1,7 +1,6 @@
 package com.clofit.backend.observer;
 
-import com.clofit.backend.MVC.Customer;
-
+import com.clofit.backend.model.Customer;
 public class CustomerObserver implements IObserver {
 
     private Customer customer;

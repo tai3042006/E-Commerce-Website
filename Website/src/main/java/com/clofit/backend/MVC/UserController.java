@@ -1,9 +1,10 @@
 package com.clofit.backend.MVC;
 
-import com.store.models.User;
-import com.store.models.Customer;
+import com.clofit.backend.model.Customer;
+import com.clofit.backend.model.User;
 
 public class UserController {
+
     private User currentUser;
     private UserView userView;
 
@@ -11,13 +12,26 @@ public class UserController {
         this.userView = userView;
     }
 
+    public Customer register(String email, String password, String name) {
+        Customer customer = new Customer(
+                java.util.UUID.randomUUID().toString(),
+                name, email, password, "", "");
+        userView.displayMessage("Customer " + name + " registered successfully.");
+        return customer;
+    }
+
+    public User login(String email, String password, String customer) {
+        userView.displayMessage("Login attempt for: " + email);
+        return currentUser;
+    }
+
     public boolean login(User user, String email, String password) {
         boolean success = user.login(email, password);
         if (success) {
             this.currentUser = user;
-            userView.displayMessage("Chào mừng trở lại, " + currentUser.getName() + "!");
+            userView.displayMessage("Welcome Back, " + currentUser.getName() + "!");
         } else {
-            userView.displayMessage("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin!");
+            userView.displayMessage("Login failed. Please check your information!");
         }
         return success;
     }
@@ -33,18 +47,17 @@ public class UserController {
         if (currentUser != null) {
             userView.displayProfile(currentUser);
         } else {
-            userView.displayMessage("Vui lòng đăng nhập để xem thông tin cá nhân!");
+            userView.displayMessage("Please log in to view your profile!");
         }
     }
 
-    public void updateProfile(String newName, String phone, String address) {
+    public void updateProfile(String id, String phone, String address) {
         if (currentUser instanceof Customer) {
-            Customer customer = (Customer) currentUser;
-            customer.setName(newName);
-            customer.setPhone(phone);
-            customer.setAddress(address);
-            userView.displayMessage("Hồ sơ Khách hàng đã được cập nhật thành công.");
-            userView.displayProfile(customer);
+            Customer c = (Customer) currentUser;
+            c.setPhone(phone);
+            c.setAddress(address);
+            userView.displayMessage("Customer profile has been updated successfully.");
+            userView.displayProfile(c);
         }
     }
 }

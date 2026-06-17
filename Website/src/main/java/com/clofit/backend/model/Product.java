@@ -1,4 +1,4 @@
-package com.clofit.model;
+package com.clofit.backend.model;
 
 public class Product {
 
@@ -10,7 +10,7 @@ public class Product {
     private int stock;
     private double rating;
     private Category category;
-
+ 
     public Product() {
     }
 

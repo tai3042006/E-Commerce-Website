@@ -1,9 +1,11 @@
 package com.clofit.backend.strategy;
 
-import com.clofit.model.Product;
 import java.util.List;
 
+import com.clofit.backend.model.Product;
+
 public interface IFilterStrategy {
-    List<Product> filter(List<Product> products);
-    String getStrategyName();
+    public List<Product> filter(List<Product> products);
+
+    public String getStrategyName();
 }

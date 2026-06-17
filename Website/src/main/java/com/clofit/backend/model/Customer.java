@@ -1,4 +1,4 @@
-package com.clofit.model;
+package com.clofit.backend.model;
 import java.util.ArrayList;
 import java.util.List;
 
