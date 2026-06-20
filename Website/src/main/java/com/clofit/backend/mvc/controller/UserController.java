@@ -7,9 +7,19 @@ public class UserController {
 
     private User currentUser;
     private UserView userView;
+    private AdminService adminService;
 
     public UserController(UserView userView) {
         this.userView = userView;
+    }
+
+    public UserController(UserView userView, AdminService adminService) {
+        this.userView = userView;
+        this.adminService = adminService;
+    }
+
+    public void setAdminService(AdminService adminService) {
+        this.adminService = adminService;
     }
 
     public Customer register(String email, String password, String name) {
@@ -17,6 +27,13 @@ public class UserController {
                 java.util.UUID.randomUUID().toString(),
                 name, email, password, "", "");
         userView.displayMessage("Customer " + name + " registered successfully.");
+
+        // Observer pattern: notify every subscribed AdminObserver that a new
+        // customer has just signed up.
+        if (adminService != null) {
+            adminService.notifyObservers("userRegistered", customer.getName() + " (" + customer.getEmail() + ")");
+        }
+
         return customer;
     }
 

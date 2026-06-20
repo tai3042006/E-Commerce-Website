@@ -1,0 +1,35 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: clofit-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: clofit
+    ports:
+      - "3307:3306"
+
+  backend:
+    build: ./server
+    container_name: clofit-api
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "4000:4000"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: clofit
+      AUTO_CREATE_DB: true
+
+  frontend:
+    build: .
+    container_name: clofit-web
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "8080:8080"

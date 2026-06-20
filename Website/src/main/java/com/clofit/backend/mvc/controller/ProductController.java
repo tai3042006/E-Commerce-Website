@@ -3,7 +3,6 @@ package com.clofit.backend.MVC;
 import com.clofit.backend.model.Category;
 import com.clofit.backend.model.Product;
 import com.clofit.backend.factory.IProductFactory;
-import com.clofit.backend.singleton.CartService;
 
 import java.util.List;
 

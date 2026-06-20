@@ -1,48 +1,62 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Logo } from "@/components/clofit/Logo";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
-const fields = [
-  { ph: "Full Name", type: "text" },
-  { ph: "Email Address", type: "email" },
-  { ph: "Phone Number", type: "tel" },
-  { ph: "Password", type: "password" },
-  { ph: "Confirm Password", type: "password" },
-];
+const SignUp = () => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", confirm: "" });
+  const [loading, setLoading] = useState(false);
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
 
-const SignUp = () => (
-  <div className="flex min-h-screen items-center justify-center bg-secondary/50 px-4 py-10">
-    <div className="w-full max-w-md rounded-3xl bg-background p-8 shadow-soft sm:p-10">
-      <div className="text-center">
-        <Logo className="text-2xl" />
-        <p className="mt-2 text-xs text-muted-foreground">Move with confidence.</p>
-        <h1 className="mt-6 text-lg font-bold">Sign Up</h1>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (form.password !== form.confirm) { toast.error("Passwords do not match"); return; }
+    if (form.password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    setLoading(true);
+    try {
+      await register(form.name, form.email, form.phone, form.password);
+      toast.success("Account created successfully!");
+      navigate("/");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-secondary/50 px-4 py-10">
+      <div className="w-full max-w-md rounded-3xl bg-background p-8 shadow-soft sm:p-10">
+        <div className="text-center">
+          <Logo className="text-2xl" />
+          <p className="mt-2 text-xs text-muted-foreground">Move with confidence.</p>
+          <h1 className="mt-6 text-lg font-bold">Create Account</h1>
+        </div>
+        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+          {[
+            { ph: "Full Name", type: "text",     k: "name",     req: true },
+            { ph: "Email",     type: "email",    k: "email",    req: true },
+            { ph: "Phone",     type: "tel",      k: "phone",    req: false },
+            { ph: "Password",  type: "password", k: "password", req: true },
+            { ph: "Confirm Password", type: "password", k: "confirm", req: true },
+          ].map(f => (
+            <input key={f.k} type={f.type} placeholder={f.ph} value={(form as any)[f.k]} onChange={set(f.k)} required={f.req}
+              className="w-full rounded-xl border border-input bg-background px-4 py-3.5 text-sm placeholder:text-muted-foreground focus:border-foreground focus:outline-none" />
+          ))}
+          <button type="submit" disabled={loading}
+            className="w-full rounded-pill bg-foreground py-4 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-50">
+            {loading ? "Creating account…" : "Sign Up"}
+          </button>
+        </form>
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          Already have an account?{" "}
+          <Link to="/signin" className="font-semibold text-foreground hover:underline">Sign In</Link>
+        </p>
       </div>
-
-      <form className="mt-8 space-y-4" onSubmit={(e) => e.preventDefault()}>
-        {fields.map((f) => (
-          <input
-            key={f.ph}
-            type={f.type}
-            placeholder={f.ph}
-            className="w-full rounded-xl border border-input bg-background px-4 py-3.5 text-sm placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
-          />
-        ))}
-        <button
-          type="submit"
-          className="w-full rounded-pill bg-foreground py-4 text-sm font-semibold text-background transition-opacity hover:opacity-90"
-        >
-          Sign Up
-        </button>
-      </form>
-
-      <p className="mt-6 text-center text-xs text-muted-foreground">
-        Already have an account?{" "}
-        <Link to="/signin" className="font-semibold text-foreground hover:underline">
-          Sign In
-        </Link>
-      </p>
     </div>
-  </div>
-);
-
+  );
+};
 export default SignUp;

@@ -1,5 +1,6 @@
 import { CartItem } from "@/models/Cart";
 import { Product, getProduct } from "@/data/products";
+import { ProductCatalog } from "@/services/ProductCatalog";
 
 class CartService {
   private static instance: CartService;
@@ -50,11 +51,19 @@ class CartService {
   }
 
   public getItems(): CartItem[] {
-    return [...this.items]; // return copy
+    return [...this.items];
   }
 
   public getCount(): number {
     return this.items.reduce((sum, item) => sum + item.qty, 0);
+  }
+
+  /** Look up a product: try API-loaded catalog first, fall back to static data. */
+  private resolveProduct(id: string): Product | undefined {
+    const catalog = ProductCatalog.getInstance();
+    const fromApi = catalog.getProductById(id);
+    if (fromApi) return fromApi;
+    return getProduct(id);
   }
 
   public getSubtotal(): number {
@@ -63,7 +72,7 @@ class CartService {
 
   public getDetailed(): { item: CartItem; product: Product }[] {
     return this.items
-      .map((it) => ({ item: it, product: getProduct(it.id)! }))
+      .map((it) => ({ item: it, product: this.resolveProduct(it.id)! }))
       .filter((d): d is { item: CartItem; product: Product } => d.product !== undefined);
   }
 
@@ -87,8 +96,13 @@ class CartService {
   }
 
   public setQty(id: string, size: string, qty: number): void {
+    if (qty <= 0) {
+      // Auto-remove when quantity reaches 0
+      this.remove(id, size);
+      return;
+    }
     this.items = this.items.map((x) =>
-      x.id === id && x.size === size ? { ...x, qty: Math.max(1, qty) } : x
+      x.id === id && x.size === size ? { ...x, qty } : x
     );
     this.saveToLocalStorage();
     this.emitChange();

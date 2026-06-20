@@ -43,7 +43,7 @@ export const CartSkeleton = () => {
                 <Skeleton className="h-3 w-24" /> {/* product name */}
                 <Skeleton className="mt-0.5 h-2 w-10" /> {/* size */}
               </div>
-              <Skeleton className="text-sm font-semibold w-16" /> {/* price }}</div>
+              <Skeleton className="text-sm font-semibold w-16" /> {/* price */}
             </div>
             <div className="mt-auto flex items-center justify-between pt-3">
               <div className="flex items-center gap-3 rounded-pill border border-border px-3 py-1">

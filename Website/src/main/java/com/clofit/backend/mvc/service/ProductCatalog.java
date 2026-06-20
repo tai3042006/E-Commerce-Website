@@ -5,8 +5,9 @@ import java.util.List;
 
 import com.clofit.backend.model.Product;
 import com.clofit.backend.observer.IObserver;
+import com.clofit.backend.observer.ISubject;
 
-public class ProductCatalog {
+public class ProductCatalog implements ISubject {
     private static ProductCatalog instance;
     private List<Product> products;
     private List<IObserver> observers;
@@ -25,6 +26,8 @@ public class ProductCatalog {
 
     public void addProduct(Product product) {
         products.add(product);
+        // Notify every subscribed CustomerObserver that a new product is available.
+        notifyObservers("productAdded", product);
     }
 
     public void removeProduct(String productId) {
@@ -53,14 +56,17 @@ public class ProductCatalog {
         return results;
     }
 
+    @Override
     public void subscribe(IObserver observer) {
         observers.add(observer);
     }
 
+    @Override
     public void unsubscribe(IObserver observer) {
         observers.remove(observer);
     }
 
+    @Override
     public void notifyObservers(String event, Object data) {
         for (IObserver observer : observers) {
             observer.update(event, data);
