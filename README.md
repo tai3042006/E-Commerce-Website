@@ -29,9 +29,7 @@ This project was built for the **Object-Oriented Design (OOD)** course, focusing
 ### Class Diagram
 
 <!-- After uploading to GitHub Issues, replace the URL below with your actual image link -->
-![Class Diagram](https://github.com/tai3042006/E-Commerce-Website/issues/2#issue-4712813247)
-
-> To add the image: go to **Issues → New Issue**, drag and drop `Main.jpg` into the text box, copy the generated link, then close the issue without submitting.
+![Class Diagram](https://github.com/user-attachments/assets/ec48d475-7129-43ec-9b1d-fbb23871f6bb)
 
 ---
 
