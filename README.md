@@ -1,57 +1,66 @@
 # CloFit — E-Commerce Fashion Platform
 
-> Nền tảng thương mại điện tử thời trang full-stack xây dựng với React + TypeScript (frontend) và Node.js + MySQL (backend), áp dụng các mẫu thiết kế hướng đối tượng: **Singleton**, **Observer**, **Strategy**.
+> A full-stack fashion e-commerce platform built with React + TypeScript (frontend) and Node.js + MySQL (backend), applying object-oriented design patterns: **Singleton**, **Observer**, **Strategy**.
 
 ---
 
-## Mục lục
+## Table of Contents
 
-- [Giới thiệu](#giới-thiệu)
-- [Tính năng](#tính-năng)
-- [Công nghệ sử dụng](#công-nghệ-sử-dụng)
-- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
-- [Cài đặt & Chạy dự án](#cài-đặt--chạy-dự-án)
-- [Biến môi trường](#biến-môi-trường)
+- [Introduction](#introduction)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
 - [Design Patterns](#design-patterns)
 - [API Endpoints](#api-endpoints)
-- [Sơ đồ cơ sở dữ liệu](#sơ-đồ-cơ-sở-dữ-liệu)
+- [Database Schema](#database-schema)
+- [Scripts](#scripts)
+- [Notes](#notes)
 
 ---
 
-## Giới thiệu
+## Introduction
 
-**CloFit** là ứng dụng thương mại điện tử thời trang cho phép người dùng duyệt và mua sắm quần áo, giày dép và phụ kiện. Hệ thống bao gồm giao diện người dùng đầy đủ chức năng và bảng quản trị admin để quản lý sản phẩm, đơn hàng và khách hàng.
+**CloFit** is a fashion e-commerce application that lets users browse and purchase clothing, shoes, and accessories. The system includes a fully-featured storefront and an admin dashboard for managing products, orders, and customers.
 
-Dự án được xây dựng trong khuôn khổ môn **Thiết Kế Hướng Đối Tượng (TKHDT)**, tập trung vào việc áp dụng các mẫu thiết kế (Design Patterns) vào bài toán thực tế.
+This project was built for the **Object-Oriented Design (OOD)** course, focusing on applying Design Patterns to real-world problems.
+
+### Class Diagram
+
+<!-- After uploading to GitHub Issues, replace the URL below with your actual image link -->
+![Class Diagram](https://github.com/tai3042006/E-Commerce-Website/issues/2#issue-4712813247)
+
+> To add the image: go to **Issues → New Issue**, drag and drop `Main.jpg` into the text box, copy the generated link, then close the issue without submitting.
 
 ---
 
-## Tính năng
+## Features
 
-### 👤 Người dùng
-- Đăng ký, đăng nhập, đăng xuất
-- Duyệt sản phẩm theo danh mục (Men / Women / Hoodies / Tees / Shoes / Accessories)
-- Xem chi tiết sản phẩm, chọn size và màu sắc
-- Thêm vào giỏ hàng và thanh toán
+### 👤 User
+- Register, log in, log out
+- Browse products by category (Men / Women / Hoodies / Tees / Shoes / Accessories)
+- View product details, select size and color
+- Add to cart and checkout
 - Wishlist / Favorites
-- Đánh giá sản phẩm (rating + bình luận)
-- Tìm kiếm sản phẩm real-time
-- Xem lịch sử đơn hàng
-- Nhận thông báo từ hệ thống
+- Rate and review products
+- Real-time product search
+- View order history
+- Receive system notifications
 
 ### ⚙️ Admin
-- Dashboard tổng quan (doanh thu, đơn hàng, sản phẩm, khách hàng)
-- Quản lý sản phẩm: thêm, sửa, xóa
-- Quản lý đơn hàng: xem và cập nhật trạng thái
-- Quản lý khách hàng
-- Nhận thông báo khi có đơn hàng mới
+- Overview dashboard (revenue, orders, products, customers)
+- Product management: create, update, delete
+- Order management: view and update status
+- Customer management
+- Receive notifications on new orders
 
 ---
 
-## Công nghệ sử dụng
+## Tech Stack
 
-| Phần | Công nghệ |
-|------|-----------|
+| Layer | Technology |
+|-------|------------|
 | Frontend | React 18 + TypeScript + Vite |
 | UI Components | shadcn/ui + Radix UI + Tailwind CSS |
 | State Management | React Context API + TanStack Query |
@@ -59,24 +68,24 @@ Dự án được xây dựng trong khuôn khổ môn **Thiết Kế Hướng Đ
 | Animation | Framer Motion |
 | Backend | Node.js + Express.js |
 | Database | MySQL 8 |
-| ORM/Driver | mysql2 |
+| DB Driver | mysql2 |
 | Auth | Token-based (custom) |
 | Build Tool | Vite 5 |
 
 ---
 
-## Cấu trúc thư mục
+## Project Structure
 
 ```
 Website/
 ├── src/                        # Frontend (React + TypeScript)
 │   ├── components/
-│   │   ├── clofit/             # Components chính của ứng dụng
+│   │   ├── clofit/             # Core application components
 │   │   │   ├── ReviewsSection.tsx
 │   │   │   ├── NotificationBell.tsx
 │   │   │   ├── CartDrawer.tsx
 │   │   │   └── ...
-│   │   └── ui/                 # shadcn/ui components
+│   │   └── ui/                 # shadcn/ui base components
 │   ├── context/                # React Context (Observer / Provider pattern)
 │   │   ├── AuthContext.tsx
 │   │   ├── CartContext.tsx
@@ -89,8 +98,8 @@ Website/
 │   │   ├── CartController.tsx
 │   │   └── ProductController.tsx
 │   ├── services/               # Service layer (Singleton pattern)
-│   │   ├── CartService.ts      # Singleton — quản lý giỏ hàng
-│   │   ├── ProductCatalog.ts   # Singleton — cache danh mục sản phẩm
+│   │   ├── CartService.ts      # Singleton — manages cart state
+│   │   ├── ProductCatalog.ts   # Singleton — caches product catalog
 │   │   └── api.ts
 │   ├── filters/                # Strategy pattern
 │   │   └── ProductFilterContext.ts
@@ -126,30 +135,30 @@ Website/
         │   └── reviews.js
         ├── db.js               # MySQL connection pool
         ├── schema.sql          # Database schema
-        ├── seed.js             # Entry point chạy seed
-        ├── seedData.js         # Dữ liệu mẫu
-        ├── seedRunner.js       # Logic seed tự động
+        ├── seed.js             # Seed entry point
+        ├── seedData.js         # Sample data
+        ├── seedRunner.js       # Auto-seed logic
         ├── migrate.js          # Migration helper
         └── index.js            # Express app entry point
 ```
 
 ---
 
-## Cài đặt & Chạy dự án
+## Getting Started
 
-### Yêu cầu
+### Prerequisites
 - Node.js >= 18
-- MySQL 8 đang chạy
+- MySQL 8 running
 - npm >= 9
 
-### 1. Clone repo
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/tai3042006/E-Commerce-Website.git
 cd E-Commerce-Website/Website
 ```
 
-### 2. Cài đặt dependencies
+### 2. Install dependencies
 
 ```bash
 # Frontend
@@ -159,47 +168,46 @@ npm install
 cd server && npm install && cd ..
 ```
 
-### 3. Cấu hình môi trường
+### 3. Configure environment
 
 ```bash
 # Backend
 cp server/.env.example server/.env
-# Mở server/.env và điền thông tin MySQL của bạn
+# Open server/.env and fill in your MySQL credentials
 
-# Frontend (tuỳ chọn — chỉ cần cho production build)
+# Frontend (optional — only needed for production builds)
 cp .env.example .env
 ```
 
-### 4. Khởi tạo database
+### 4. Initialize the database
 
 ```bash
-# Tạo schema + seed dữ liệu mẫu
 npm run seed
 ```
 
-> Database và bảng sẽ được tạo tự động nếu chưa tồn tại (biến `AUTO_CREATE_DB=true`).
+> The database and tables are created automatically if they don't exist (`AUTO_CREATE_DB=true`).
 
-### 5. Chạy ứng dụng
+### 5. Run the application
 
 ```bash
-# Chạy cả frontend lẫn backend cùng lúc
+# Run both frontend and backend simultaneously
 npm run dev:all
 
-# Hoặc chạy riêng từng phần
+# Or run separately
 npm run dev          # Frontend → http://localhost:5173
 npm run dev:backend  # Backend  → http://localhost:4000
 ```
 
-### Tài khoản mặc định sau seed
+### Default accounts after seed
 
-| Role | Email | Mật khẩu |
-|------|-------|----------|
-| Admin | admin@clofit.com | admin123 |
-| User  | user@clofit.com  | user123  |
+| Role  | Email             | Password |
+|-------|-------------------|----------|
+| Admin | admin@clofit.com  | admin123 |
+| User  | user@clofit.com   | user123  |
 
 ---
 
-## Biến môi trường
+## Environment Variables
 
 ### `server/.env`
 
@@ -213,10 +221,10 @@ AUTO_CREATE_DB=true
 PORT=4000
 ```
 
-### `.env` (frontend — tuỳ chọn)
+### `.env` (frontend — optional)
 
 ```env
-# Chỉ cần nếu deploy production trỏ sang server khác
+# Only needed if deploying to a remote server
 # VITE_API_URL=http://localhost:4000/api
 ```
 
@@ -226,7 +234,7 @@ PORT=4000
 
 ### 1. Singleton — `CartService` & `ProductCatalog`
 
-Đảm bảo chỉ có **một instance duy nhất** tồn tại trong suốt vòng đời ứng dụng.
+Ensures only **one instance** exists throughout the application lifecycle.
 
 ```typescript
 // src/services/CartService.ts
@@ -246,7 +254,7 @@ class CartService {
 }
 ```
 
-**Java tương đương:**
+**Java equivalent:**
 ```java
 public class CartService {
     private static CartService instance;
@@ -262,7 +270,7 @@ public class CartService {
 
 ### 2. Observer — `NotificationContext`
 
-Khi có sự kiện mới (đơn hàng, sản phẩm mới), tất cả subscriber được thông báo tự động. Backend poll mỗi 30 giây.
+When a new event occurs (new order, new product), all subscribers are notified automatically. The client polls every 30 seconds.
 
 ```typescript
 // src/context/NotificationContext.tsx
@@ -274,10 +282,10 @@ useEffect(() => {
 }, [user]);
 ```
 
-- **AdminObserver**: nhận thông báo khi có đơn hàng mới (`audience = 'admin'`)
-- **CustomerObserver**: nhận thông báo khi có sản phẩm mới (`audience = 'customer'`)
+- **AdminObserver**: receives notifications when a new order is placed (`audience = 'admin'`)
+- **CustomerObserver**: receives notifications when a new product is added (`audience = 'customer'`)
 
-**Java tương đương:**
+**Java equivalent:**
 ```java
 interface NotificationObserver {
     void update(String event, String message);
@@ -290,7 +298,7 @@ class CustomerObserver implements NotificationObserver { ... }
 
 ### 3. Strategy — `ProductFilterContext`
 
-Cho phép **hoán đổi linh hoạt** thuật toán lọc sản phẩm mà không sửa code hiện tại.
+Allows **flexible swapping** of filtering algorithms without modifying existing code.
 
 ```typescript
 // src/filters/ProductFilterContext.ts
@@ -306,15 +314,15 @@ class ProductFilterContext {
   }
 }
 
-// Sử dụng
+// Usage
 const ctx = new ProductFilterContext();
 ctx.setStrategy(new CategoryFilterStrategy("hoodies"));
 const filtered = ctx.executeFilter(allProducts);
 ```
 
-Các strategy được hỗ trợ: `CategoryFilterStrategy`, `PriceFilterStrategy`, `RatingFilterStrategy`.
+Supported strategies: `CategoryFilterStrategy`, `PriceFilterStrategy`, `RatingFilterStrategy`.
 
-**Java tương đương:**
+**Java equivalent:**
 ```java
 interface FilterStrategy {
     List<Product> execute(List<Product> products);
@@ -329,53 +337,53 @@ class PriceFilterStrategy implements FilterStrategy { ... }
 
 ### Auth — `/api/auth`
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| POST | `/api/auth/register` | Đăng ký tài khoản mới |
-| POST | `/api/auth/login` | Đăng nhập, nhận token |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register a new account |
+| POST | `/api/auth/login` | Log in and receive a token |
 
 ### Products — `/api`
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/products` | Danh sách sản phẩm (filter: `?gender=`, `?category=`) |
-| GET | `/api/products/:id` | Chi tiết sản phẩm |
-| POST | `/api/products` | Thêm sản phẩm mới (admin) |
-| PUT | `/api/products/:id` | Cập nhật sản phẩm (admin) |
-| DELETE | `/api/products/:id` | Xóa sản phẩm (admin) |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/products` | List products (filter: `?gender=`, `?category=`) |
+| GET | `/api/products/:id` | Get product details |
+| POST | `/api/products` | Create a product (admin) |
+| PUT | `/api/products/:id` | Update a product (admin) |
+| DELETE | `/api/products/:id` | Delete a product (admin) |
 
 ### Reviews — `/api`
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/products/:id/reviews` | Lấy đánh giá của sản phẩm |
-| POST | `/api/products/:id/reviews` | Gửi đánh giá mới |
-| DELETE | `/api/reviews/:id` | Xóa đánh giá |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/products/:id/reviews` | Get reviews for a product |
+| POST | `/api/products/:id/reviews` | Submit a new review |
+| DELETE | `/api/reviews/:id` | Delete a review |
 
 ### Orders — `/api`
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/orders` | Danh sách đơn hàng |
-| POST | `/api/orders` | Tạo đơn hàng mới |
-| PATCH | `/api/orders/:id` | Cập nhật trạng thái đơn hàng |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/orders` | List all orders |
+| POST | `/api/orders` | Place a new order |
+| PATCH | `/api/orders/:id` | Update order status |
 
 ### Notifications — `/api/notifications`
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/notifications` | Lấy thông báo của user hiện tại |
-| PATCH | `/api/notifications/read` | Đánh dấu tất cả đã đọc |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/notifications` | Get notifications for the current user |
+| PATCH | `/api/notifications/read` | Mark all as read |
 
 ### Customers — `/api`
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/customers` | Danh sách khách hàng (admin) |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/customers` | List all customers (admin) |
 
 ---
 
-## Sơ đồ cơ sở dữ liệu
+## Database Schema
 
 ```
 categories          products               product_images
@@ -409,18 +417,18 @@ comment
 ## Scripts
 
 ```bash
-npm run dev:all     # Chạy frontend + backend đồng thời
-npm run dev         # Chỉ frontend (port 5173)
-npm run dev:backend # Chỉ backend  (port 4000)
-npm run build       # Build production frontend
-npm run seed        # Khởi tạo DB + seed dữ liệu mẫu
-npm run test        # Chạy unit tests (Vitest)
+npm run dev:all      # Run frontend + backend simultaneously
+npm run dev          # Frontend only (port 5173)
+npm run dev:backend  # Backend only  (port 4000)
+npm run build        # Build production frontend
+npm run seed         # Initialize DB + seed sample data
+npm run test         # Run unit tests (Vitest)
 ```
 
 ---
 
-## Ghi chú
+## Notes
 
-- Vite dev server tự động proxy `/api` → `http://localhost:4000`, không cần cấu hình thêm khi dev local.
-- Trang admin được bảo vệ bởi `AdminRoute` component — chỉ user có `role = 'admin'` mới truy cập được.
-- Dữ liệu giỏ hàng được lưu vào `localStorage` và đồng bộ qua `CartService.subscribe()`.
+- The Vite dev server automatically proxies `/api` → `http://localhost:4000`, so no extra config is needed for local development.
+- All `/admin/*` routes are protected by the `AdminRoute` component — only users with `role = 'admin'` can access them.
+- Cart data is persisted to `localStorage` and kept in sync via `CartService.subscribe()`.
