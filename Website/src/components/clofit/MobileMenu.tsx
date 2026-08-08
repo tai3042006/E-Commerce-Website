@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useUI } from "@/context/UIContext";
+import { useUI } from "@/context/UIContext.hooks";
 import { X, ChevronRight } from "lucide-react";
 import { NavLink, Link } from "react-router-dom";
 

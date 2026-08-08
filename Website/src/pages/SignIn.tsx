@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Logo } from "@/components/clofit/Logo";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext.hooks";
 import { toast } from "sonner";
 
 const SignIn = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as any)?.from || "/";
+  interface LocationState {
+    from?: string;
+  }
+  const from = (location.state as LocationState)?.from || "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,8 +23,8 @@ const SignIn = () => {
       await login(email, password);
       toast.success("Welcome back!");
       navigate(from, { replace: true });
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }

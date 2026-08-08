@@ -1,18 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState, useCallback, ReactNode } from "react";
+import { useState, useEffect, useMemo, useCallback, ReactNode } from "react";
+import { ProductContext, type FilterStrategy, type Ctx, useProduct } from "./ProductController.hooks";
 import { Product } from "@/data/products";
 import { ProductCatalog } from "@/services/ProductCatalog";
 import { ProductFilterContext } from "@/filters/ProductFilterContext";
-
-type FilterStrategy = Parameters<ProductFilterContext["setStrategy"]>[0];
-
-type Ctx = {
-  products: Product[];
-  filteredProducts: Product[];
-  loading: boolean;
-  setFilterStrategy: (strategy: FilterStrategy) => void;
-};
-
-const ProductContext = createContext<Ctx | null>(null);
 
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -47,10 +37,4 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   );
 
   return <ProductContext.Provider value={value}>{children}</ProductContext.Provider>;
-};
-
-export const useProduct = () => {
-  const ctx = useContext(ProductContext);
-  if (!ctx) throw new Error("useProduct must be used within ProductProvider");
-  return ctx;
 };

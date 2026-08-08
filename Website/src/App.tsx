@@ -1,6 +1,6 @@
 import { lazy, Suspense, ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation, Outlet } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +9,8 @@ import { WishlistProvider } from "./context/WishlistContext";
 import { CartProvider } from "./controllers/CartController";
 import { ProductProvider } from "@/controllers/ProductController";
 import { UIProvider } from "./context/UIContext";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
+import { useAuth } from "./context/AuthContext.hooks";
 import { OrderProvider } from "./context/OrderContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ScrollToTop } from "./components/clofit/ScrollToTop";
@@ -27,7 +28,7 @@ const Product           = lazy(() => import("./pages/Product"));
 const Cart              = lazy(() => import("./pages/Cart"));
 const Checkout          = lazy(() => import("./pages/Checkout"));
 const Wishlist          = lazy(() => import("./pages/Wishlist"));
-const Account           = lazy(() => import("./pages/Account"));
+const AccountDashboard  = lazy(() => import("./pages/Account"));
 const SearchPage        = lazy(() => import("./pages/Search"));
 const SignIn            = lazy(() => import("./pages/SignIn"));
 const SignUp            = lazy(() => import("./pages/SignUp"));
@@ -37,6 +38,11 @@ const AdminDashboard    = lazy(() => import("./pages/admin/Dashboard"));
 const AdminProducts     = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminOrders       = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminCustomers    = lazy(() => import("./pages/admin/AdminCustomers"));
+// Account sections
+const AccountAddresses  = lazy(() => import("./pages/AccountAddresses"));
+const AccountPaymentMethods = lazy(() => import("./pages/AccountPaymentMethods"));
+const AccountNotifications = lazy(() => import("./pages/AccountNotifications"));
+const AccountSettings   = lazy(() => import("./pages/AccountSettings"));
 
 const queryClient = new QueryClient();
 
@@ -81,7 +87,13 @@ const AnimatedRoutes = () => {
           <Route path="/cart" element={<Suspense fallback={<PageSkeleton />}><Page><Cart /></Page></Suspense>} />
           <Route path="/checkout" element={<Suspense fallback={<PageSkeleton />}><Page><Checkout /></Page></Suspense>} />
           <Route path="/wishlist" element={<Suspense fallback={<PageSkeleton />}><Page><Wishlist /></Page></Suspense>} />
-          <Route path="/account" element={<Suspense fallback={<PageSkeleton />}><Page><Account /></Page></Suspense>} />
+          <Route path="/account" element={<Suspense fallback={<PageSkeleton />}><Page><Outlet /></Page></Suspense>} >
+            <Route index element={<AccountDashboard />} />
+            <Route path="addresses" element={<AccountAddresses />} />
+            <Route path="payment-methods" element={<AccountPaymentMethods />} />
+            <Route path="notifications" element={<AccountNotifications />} />
+            <Route path="settings" element={<AccountSettings />} />
+          </Route>
           <Route path="/search" element={<Suspense fallback={<PageSkeleton />}><Page><SearchPage /></Page></Suspense>} />
           <Route path="/bag" element={<Navigate to="/cart" replace />} />
           <Route path="/favorites" element={<Navigate to="/wishlist" replace />} />

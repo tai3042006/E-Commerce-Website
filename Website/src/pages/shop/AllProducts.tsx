@@ -15,7 +15,7 @@ import { ProductCard } from "@/components/clofit/ProductCard";
 import { Breadcrumbs } from "@/components/clofit/Breadcrumbs";
 import { products, Product, ProductCategory, categories } from "@/data/products";
 import { Slider } from "@/components/ui/slider";
-import { useUI } from "@/context/UIContext";
+import { useUI } from "@/context/UIContext.hooks";
 
 type Sort =
   | "featured"
@@ -224,9 +224,7 @@ const AllProducts = () => {
     subcategoryParam,
     q,
     sort,
-    view,
     priceMax,
-    products,
   ]);
 
   const heading =

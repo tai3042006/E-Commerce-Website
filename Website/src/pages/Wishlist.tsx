@@ -3,7 +3,7 @@ import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/clofit/Layout";
 import { ProductCard } from "@/components/clofit/ProductCard";
-import { useWishlist } from "@/context/WishlistContext";
+import { useWishlist } from "@/context/WishlistContext.hooks";
 import { ProductCatalog } from "@/services/ProductCatalog";
 import { Product } from "@/data/products";
 

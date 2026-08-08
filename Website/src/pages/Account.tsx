@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { User, ShoppingBag, Heart, MapPin, CreditCard, Bell, Settings, LogOut, ChevronRight, Package, Star } from "lucide-react";
 import { Layout } from "@/components/clofit/Layout";
 import { Breadcrumbs } from "@/components/clofit/Breadcrumbs";
-import { useAuth } from "@/context/AuthContext";
-import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext.hooks";
+import { useWishlist } from "@/context/WishlistContext.hooks";
 import { toast } from "sonner";
 
 const TOKEN_KEY = "clofit:token";
@@ -148,10 +148,10 @@ const Account = () => {
               { icon: ShoppingBag,label: "Cart",     to: "/cart" },
             ]},
             { heading: "Account", items: [
-              { icon: MapPin,     label: "Shipping Addresses",  to: "/account#addresses" },
-              { icon: CreditCard, label: "Payment Methods",     to: "/account#payment" },
-              { icon: Bell,       label: "Notifications",       to: "/account#notifications" },
-              { icon: Settings,   label: "Settings",            to: "/account#settings" },
+              { icon: MapPin,     label: "Shipping Addresses",  to: "/account/addresses" },
+              { icon: CreditCard, label: "Payment Methods",     to: "/account/payment-methods" },
+              { icon: Bell,       label: "Notifications",       to: "/account/notifications" },
+              { icon: Settings,   label: "Settings",            to: "/account/settings" },
             ]},
           ].map(g => (
             <div key={g.heading}>

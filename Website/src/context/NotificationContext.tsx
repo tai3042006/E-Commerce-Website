@@ -1,52 +1,5 @@
-/**
- * NotificationContext — implements the client-side half of the Observer pattern.
- *
- * Polls GET /api/notifications/count every 30 s while the user is logged in.
- * When the unread count rises, fetches the newest items and fires a toast for
- * each new notification, matching the Java CustomerObserver / AdminObserver
- * update() behaviour.
- */
-
-import {
-  createContext, useContext, useEffect, useRef,
-  useState, useCallback, ReactNode,
-} from "react";
-import { toast } from "sonner";
-import { useAuth } from "./AuthContext";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-export type Notification = {
-  id: string;
-  event: string;
-  message: string;
-  link?: string | null;
-  isRead: boolean;
-  createdAt: string;
-};
-
-type NotifCtx = {
-  unread:          number;
-  notifications:   Notification[];
-  loading:         boolean;
-  refresh:         () => Promise<void>;
-  markAllRead:     () => Promise<void>;
-  markOneRead:     (id: string) => Promise<void>;
-};
-
-const NotifContext = createContext<NotifCtx | null>(null);
-
-const TOKEN_KEY = "clofit:token";
-const getToken  = () => localStorage.getItem(TOKEN_KEY);
-
-const authHeaders = () => ({
-  "Content-Type": "application/json",
-  ...(getToken() ? { "x-auth-token": getToken()! } : {}),
-});
-
-const POLL_MS = 30_000; // 30 seconds
-
-// ── Provider ──────────────────────────────────────────────────────────────────
+import { useState, useEffect, useRef, useCallback } from "react";
+import { NotifContext, type Notification, type NotifCtx, useNotifications, TOKEN_KEY, getToken, authHeaders, POLL_MS } from "./NotificationContext.hooks";
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
@@ -167,10 +120,4 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </NotifContext.Provider>
   );
-};
-
-export const useNotifications = () => {
-  const ctx = useContext(NotifContext);
-  if (!ctx) throw new Error("useNotifications must be inside NotificationProvider");
-  return ctx;
 };

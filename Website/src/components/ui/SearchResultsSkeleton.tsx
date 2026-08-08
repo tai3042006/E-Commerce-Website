@@ -1,4 +1,5 @@
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const SearchResultsSkeleton = ({ count = 4 }: { count?: number }) => {
   return (

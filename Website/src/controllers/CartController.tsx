@@ -1,20 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
-import { Product, getProduct } from "@/data/products";
-import { CartItem } from "@/models/Cart";
+import { useState, useEffect, useMemo } from "react";
+import { CartContext, type Ctx, useCart } from "./CartController.hooks";
 import { cartService } from "@/services/CartService";
-
-type Ctx = {
-  items: CartItem[];
-  count: number;
-  subtotal: number;
-  add: (p: Product, size: string, qty?: number) => void;
-  remove: (id: string, size: string) => void;
-  setQty: (id: string, size: string, qty: number) => void;
-  clear: () => void;
-  detailed: { item: CartItem; product: Product }[];
-};
-
-const CartContext = createContext<Ctx | null>(null);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<Ctx>(() => {
@@ -48,10 +34,4 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return <CartContext.Provider value={state}>{children}</CartContext.Provider>;
-};
-
-export const useCart = () => {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used within CartProvider");
-  return ctx;
 };

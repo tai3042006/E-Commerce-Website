@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import { randomUUID } from 'node:crypto';
 import { getPool } from '../db.js';
+import bcrypt from 'bcrypt';
 
 const router = Router();
 
+// Simple hash function (same as before) - for verifying legacy hashes only
 function simpleHash(plain) {
   let h = 0x811c9dc5;
   for (let i = 0; i < plain.length; i++) {
@@ -13,7 +15,12 @@ function simpleHash(plain) {
   return h.toString(16).padStart(8, '0') + plain.length.toString(16);
 }
 
-function verifyHash(plain, stored) {
+// Verify password against stored hash (supports both simpleHash and bcrypt)
+async function verifyPassword(plain, stored) {
+  if (stored.startsWith('$2b$') || stored.startsWith('$2a$') || stored.startsWith('$2y$')) {
+    return await bcrypt.compare(plain, stored);
+  }
+  // Assume it's a legacy simpleHash
   return simpleHash(plain) === stored;
 }
 
@@ -126,7 +133,7 @@ router.post('/register', async (req, res, next) => {
     }
 
     const id = randomUUID();
-    const hashed = simpleHash(password);
+    const hashed = await bcrypt.hash(password, 10);
     const role = 'customer';
 
     await pool.query(
@@ -174,8 +181,21 @@ router.post('/login', async (req, res, next) => {
       'SELECT id, name, email, password, role FROM users WHERE email = ?',
       [email]
     );
-    if (!user || !verifyHash(password, user.password)) {
+    if (!user) {
       return res.status(401).json({ error: 'invalid_credentials' });
+    }
+    const valid = await verifyPassword(password, user.password);
+    if (!valid) {
+      return res.status(401).json({ error: 'invalid_credentials' });
+    }
+    // If the stored password is not bcrypt, upgrade it to bcrypt
+    if (!(user.password.startsWith('$2b$') || user.password.startsWith('$2a$') || user.password.startsWith('$2y$'))) {
+      const newHash = await bcrypt.hash(password, 10);
+      await pool.query(
+        'UPDATE users SET password = ? WHERE id = ?',
+        [newHash, user.id]
+      );
+      console.log('[auth] Upgraded password to bcrypt for user:', user.email);
     }
     const token = await createSession(user.id, user.role);
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });

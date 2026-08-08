@@ -1,18 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from "react";
-
-type Ctx = {
-  searchOpen: boolean;
-  cartOpen: boolean;
-  menuOpen: boolean;
-  openSearch: () => void;
-  closeSearch: () => void;
-  openCart: () => void;
-  closeCart: () => void;
-  openMenu: () => void;
-  closeMenu: () => void;
-};
-
-const UIContext = createContext<Ctx | null>(null);
+import { useCallback, useEffect, useMemo, useState, ReactNode } from "react";
+import { UIContext, type Ctx, useUI } from "./UIContext.hooks";
 
 export const UIProvider = ({ children }: { children: ReactNode }) => {
   const [searchOpen, setSearch] = useState(false);
@@ -48,14 +35,8 @@ export const UIProvider = ({ children }: { children: ReactNode }) => {
     openCart: () => { setCart(true); setSearch(false); setMenu(false); },
     closeCart: () => setCart(false),
     openMenu: () => { setMenu(true); setSearch(false); setCart(false); },
-    closeMenu: () => setMenu(false),
+    closeMenu: () => setMenu(false)
   }), [searchOpen, cartOpen, menuOpen]);
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
-};
-
-export const useUI = () => {
-  const ctx = useContext(UIContext);
-  if (!ctx) throw new Error("useUI must be used within UIProvider");
-  return ctx;
 };

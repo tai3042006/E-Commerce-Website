@@ -8,9 +8,9 @@ import { Product as ProductType } from "@/data/products";
 import { ProductCatalog } from "@/services/ProductCatalog";
 import { ProductCard } from "@/components/clofit/ProductCard";
 import { ReviewsSection } from "@/components/clofit/ReviewsSection";
-import { useCart } from "@/controllers/CartController";
-import { useWishlist } from "@/context/WishlistContext";
-import { useUI } from "@/context/UIContext";
+import { useCart } from "@/controllers/CartController.hooks";
+import { useWishlist } from "@/context/WishlistContext.hooks";
+import { useUI } from "@/context/UIContext.hooks";
 import { toast } from "sonner";
 
 const Product = () => {

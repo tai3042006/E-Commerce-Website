@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowDownRight, ArrowUpRight, DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext.hooks";
 import { statusStyles } from "@/data/admin";
 
 type Order    = { id: string; customer: string; total: number; status: string; date: string; product: string };

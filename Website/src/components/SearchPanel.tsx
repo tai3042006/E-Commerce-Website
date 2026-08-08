@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, X } from 'lucide-react';
-import { getProducts } from '@/data/products';
+import { products } from '@/data/products';
 import { ProductCard } from '@/components/clofit/ProductCard';
 import { useNavigate } from "react-router-dom";
 
@@ -42,7 +42,6 @@ export const SearchPanel = ({ onCloseSearch }: { onCloseSearch: () => void }) =>
       return;
     }
 
-    const products = getProducts();
     const filtered = products.filter(product =>
       product.name.toLowerCase().includes(value.toLowerCase()) ||
       product.category.toLowerCase().includes(value.toLowerCase()) ||
@@ -52,12 +51,12 @@ export const SearchPanel = ({ onCloseSearch }: { onCloseSearch: () => void }) =>
     setResults(filtered.slice(0, 8)); // Limit to 8 results
   };
 
-  const handleClickOutside = (e: MouseEvent) => {
+  const handleClickOutside = useCallback((e: MouseEvent) => {
     if (e.target instanceof HTMLElement && !e.target.closest('.search-panel-content')) {
       setIsOpen(false);
       onCloseSearch();
     }
-  };
+  }, [onCloseSearch]);
 
   useEffect(() => {
     if (isOpen) {
@@ -66,7 +65,7 @@ export const SearchPanel = ({ onCloseSearch }: { onCloseSearch: () => void }) =>
       document.removeEventListener('click', handleClickOutside);
     }
     return () => document.removeEventListener('click', handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, handleClickOutside]);
 
   if (!isOpen) return null;
 

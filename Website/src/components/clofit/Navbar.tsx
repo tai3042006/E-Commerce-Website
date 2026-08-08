@@ -2,9 +2,9 @@ import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, ShoppingBag, Heart, User, Menu, LogOut } from "lucide-react";
 import { Logo } from "./Logo";
 import { useEffect, useRef, useState } from "react";
-import { useUI } from "@/context/UIContext";
-import { useCart } from "@/controllers/CartController";
-import { useAuth } from "@/context/AuthContext";
+import { useUI } from "@/context/UIContext.hooks";
+import { useCart } from "@/controllers/CartController.hooks";
+import { useAuth } from "@/context/AuthContext.hooks";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { products, ProductCategory } from "@/data/products";
 import { toast } from "sonner";
@@ -24,9 +24,31 @@ const topLinks = [
 ];
 
 const megaMenuVariants: Variants = {
-  initial: { y: -20, opacity: 0 },
-  animate: { y: 0,   opacity: 1, transition: { type: "spring", stiffness: 400, damping: 20 } },
-  exit:    { y: -20, opacity: 0, transition: { ease: "easeIn" } },
+  initial: {
+    y: -20,
+    opacity: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 20
+    } as const
+  },
+  animate: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 20
+    } as const
+  },
+  exit:    {
+    y: -20,
+    opacity: 0,
+    transition: {
+      ease: "easeIn"
+    } as const
+  }
 };
 
 function getInitials(name: string) {
@@ -191,8 +213,12 @@ export const Navbar = () => {
       {/* Mega menu */}
       <AnimatePresence>
         {hovered && (
-          <motion.div key={hovered} {...megaMenuVariants}
-            initial={megaMenuVariants.initial} animate={megaMenuVariants.animate} exit={megaMenuVariants.exit}
+          <motion.div
+            key={hovered}
+            variants={megaMenuVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
             className="absolute inset-x-0 top-full hidden border-t border-background/20 bg-background/80 backdrop-blur-sm shadow-lg md:block">
             <div className="container-clofit grid grid-cols-12 gap-8 py-10 px-4 lg:px-6">
               <div className="col-span-3">
@@ -217,7 +243,16 @@ export const Navbar = () => {
               <div className="col-span-9 grid grid-cols-3 gap-6">
                 {products.filter(p => p.category === hovered).slice(0, 3).map((p, i) => (
                   <motion.div key={p.id} initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1, transition: { delay: i * 0.05, type: "spring", stiffness: 300, damping: 20 } }}
+                    animate={{
+                      y: 0,
+                      opacity: 1,
+                      transition: {
+                        delay: i * 0.05,
+                        type: "spring" as const,
+                        stiffness: 300,
+                        damping: 20
+                      } as const
+                    }}
                     className="group">
                     <Link to={`/product/${p.id}`} className="block">
                       <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-secondary transition-transform duration-700 ease-out group-hover:scale-105">

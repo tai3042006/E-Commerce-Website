@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext.hooks";
 
 type Review = {
   id: string;
@@ -15,6 +15,11 @@ type Review = {
   isOwn: boolean;
 };
 
+type ReviewApiResponse =
+  | Review[]
+  | { product: { rating: number; reviews: number } }
+  | { error?: string };
+
 const TOKEN_KEY = "clofit:token";
 const getToken  = () => localStorage.getItem(TOKEN_KEY);
 const authHeaders = () => ({
@@ -24,7 +29,7 @@ const authHeaders = () => ({
 
 /** Safely parse JSON — never throws on empty body or an HTML error page
  *  (e.g. the backend route doesn't exist yet, or the server is down/stale). */
-async function safeJson(r: Response): Promise<any> {
+async function safeJson(r: Response): Promise<ReviewApiResponse> {
   const text = await r.text();
   if (!text.trim()) return {};
   try {
@@ -140,8 +145,9 @@ export const ReviewsSection = ({
       });
       const data = await safeJson(r);
       if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "Could not submit review");
+      const { product } = data as { product: { rating: number; reviews: number } };
       toast.success("Thanks for your review!");
-      onAggregateChange?.(data.product);
+      onAggregateChange?.(product);
       load();
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Could not submit review");
@@ -159,7 +165,8 @@ export const ReviewsSection = ({
       });
       const data = await safeJson(r);
       if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "Could not delete review");
-      onAggregateChange?.(data.product);
+      const { product } = data as { product: { rating: number; reviews: number } };
+      onAggregateChange?.(product);
       setMyRating(0);
       setMyComment("");
       setAnonymous(false);

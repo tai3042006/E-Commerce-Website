@@ -1,33 +1,6 @@
 import { motion } from "framer-motion";
-
-export const emptyStateVariants = {
-  enter: (direction: "up" | "down" = "up") => ({
-    opacity: 0,
-    y: direction === "up" ? 20 : -20,
-    transition: { type: "spring", stiffness: 300, damping: 20 },
-  }),
-  center: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 300, damping: 20 },
-  },
-  exit: (direction: "up" | "down" = "up") => ({
-    opacity: 0,
-    y: direction === "up" ? -20 : 20,
-    transition: { type: "spring", stiffness: 300, damping: 20 },
-  }),
-};
-
-interface EmptyStateProps {
-  title: string;
-  description: string;
-  actionLabel?: string;
-  actionOnClick?: () => void;
-  actionTo?: string; // for Link
-  illustration?: React.ReactNode;
-  className?: string;
-  animationDirection?: "up" | "down";
-}
+import { Link } from "react-router-dom";
+import { emptyStateVariants, EmptyStateProps } from "./EmptyState.hooks";
 
 export const EmptyState = ({
   title,

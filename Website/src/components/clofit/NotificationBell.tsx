@@ -9,7 +9,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useNotifications, Notification } from "@/context/NotificationContext";
+import { useNotifications, Notification } from "@/context/NotificationContext.hooks";
 import { useNavigate } from "react-router-dom";
 
 function timeAgo(iso: string): string {

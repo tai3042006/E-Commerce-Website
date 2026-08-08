@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { Layout } from "@/components/clofit/Layout";
 import { Breadcrumbs } from "@/components/clofit/Breadcrumbs";
-import { useCart } from "@/controllers/CartController";
+import { useCart } from "@/controllers/CartController.hooks";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -87,7 +87,7 @@ const Cart = () => {
                   </div>
                 </dl>
                 <button onClick={() => navigate("/checkout")}
-                  className="mt-6 block w-full rounded-pill bg-foreground py-4 text-center text-sm font-semibold text-background hover:opacity-90">
+                  className="mt-6 block w-full rounded-pill bg-foreground py-4 text-center text-sm font-bold text-background hover:opacity-90">
                   Checkout
                 </button>
                 <Link to="/shop" className="mt-3 block w-full rounded-pill border border-border py-3.5 text-center text-sm font-medium hover:bg-secondary">

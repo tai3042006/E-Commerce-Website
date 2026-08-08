@@ -1,15 +1,22 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Logo } from "@/components/clofit/Logo";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext.hooks";
 import { toast } from "sonner";
+interface FormValues {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirm: string;
+}
 
 const SignUp = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", confirm: "" });
+  const [form, setForm] = useState<FormValues>({ name: "", email: "", phone: "", password: "", confirm: "" });
   const [loading, setLoading] = useState(false);
-  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
+  const set = (k: keyof FormValues) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,8 +27,8 @@ const SignUp = () => {
       await register(form.name, form.email, form.phone, form.password);
       toast.success("Account created successfully!");
       navigate("/");
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -43,7 +50,7 @@ const SignUp = () => {
             { ph: "Password",  type: "password", k: "password", req: true },
             { ph: "Confirm Password", type: "password", k: "confirm", req: true },
           ].map(f => (
-            <input key={f.k} type={f.type} placeholder={f.ph} value={(form as any)[f.k]} onChange={set(f.k)} required={f.req}
+            <input key={f.k} type={f.type} placeholder={f.ph} value={form[f.k]} onChange={set(f.k)} required={f.req}
               className="w-full rounded-xl border border-input bg-background px-4 py-3.5 text-sm placeholder:text-muted-foreground focus:border-foreground focus:outline-none" />
           ))}
           <button type="submit" disabled={loading}

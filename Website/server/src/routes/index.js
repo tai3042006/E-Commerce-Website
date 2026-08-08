@@ -8,6 +8,10 @@ import customersRouter     from './routes/customers.js';
 import ordersRouter        from './routes/orders.js';
 import authRouter          from './routes/auth.js';
 import notificationsRouter from './routes/notifications.js';
+import reviewsRouter       from './routes/reviews.js';
+import addressesRouter      from './routes/addresses.js';
+import paymentMethodsRouter from './routes/paymentMethods.js';
+import settingsRouter       from './routes/settings.js';
 
 const app  = express();
 const PORT = Number(process.env.PORT) || 4000;
@@ -22,6 +26,10 @@ app.use('/api',               customersRouter);
 app.use('/api',               ordersRouter);
 app.use('/api/auth',          authRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api',               reviewsRouter);
+app.use('/api',               addressesRouter);
+app.use('/api',               paymentMethodsRouter);
+app.use('/api',               settingsRouter);
 
 app.use((err, _req, res, _next) => {
   console.error('[server] error:', err.message);
@@ -107,25 +115,81 @@ async function bootstrap() {
     await ensureColumn(pool, 'notifications', 'created_at', 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER is_read');
 
     console.log('[bootstrap] ✓ notifications table ready');
+    // 3. addresses table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS addresses (
+        id          VARCHAR(50)    NOT NULL,
+        customer_id VARCHAR(50)    NOT NULL,
+        full_name   VARCHAR(150)   NOT NULL,
+        phone       VARCHAR(50)    NOT NULL,
+        address_line VARCHAR(200)  NOT NULL,
+        city        VARCHAR(100)   NOT NULL,
+        is_default  TINYINT(1)     NOT NULL DEFAULT 0,
+        created_at  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_addresses_customer (customer_id),
+        CONSTRAINT fk_addresses_customer
+          FOREIGN KEY (customer_id) REFERENCES users(id)
+          ON DELETE CASCADE ON UPDATE CASCADE
+      ) ENGINE=InnoDB
+    `);
+    console.log('[bootstrap] ✓ addresses table ready');
+
+    // 4. payment_methods table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS payment_methods (
+        id          VARCHAR(50)    NOT NULL,
+        customer_id VARCHAR(50)    NOT NULL,
+        card_brand  VARCHAR(20)    NOT NULL,
+        last4       VARCHAR(4)     NOT NULL,
+        expiry_month TINYINT      NOT NULL,
+        expiry_year  SMALLINT     NOT NULL,
+        is_default  TINYINT(1)     NOT NULL DEFAULT 0,
+        created_at  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_payment_customer (customer_id),
+        CONSTRAINT fk_payment_customer
+          FOREIGN KEY (customer_id) REFERENCES users(id)
+          ON DELETE CASCADE ON UPDATE CASCADE
+      ) ENGINE=InnoDB
+    `);
+    console.log('[bootstrap] ✓ payment_methods table ready');
+
 
     // 3. Admin user
-    const adminHash = simpleHash('admin123');
-    const [[adminRow]] = await pool.query(
-      "SELECT id FROM users WHERE email = 'admin@clofit.com' LIMIT 1"
-    );
-    if (adminRow) {
-      await pool.query(
-        "UPDATE users SET password = ?, role = 'admin' WHERE email = 'admin@clofit.com'",
-        [adminHash]
-      );
-      console.log('[bootstrap] ✓ Admin password synced (admin@clofit.com / admin123)');
-    } else {
-      await pool.query(
-        "INSERT INTO users (id, name, email, phone, password, role) VALUES (?, 'Site Admin', 'admin@clofit.com', NULL, ?, 'admin')",
-        [randomUUID(), adminHash]
-      );
-      console.log('[bootstrap] ✓ Admin user created (admin@clofit.com / admin123)');
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const nodeEnv = process.env.NODE_ENV || 'development';
+
+    if (nodeEnv === 'production') {
+      if (!adminEmail || !adminPassword) {
+        throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set in production');
+      }
     }
+
+    if (adminEmail && adminPassword) {
+      const adminHash = simpleHash(adminPassword);
+      const [[adminRow]] = await pool.query(
+        "SELECT id FROM users WHERE email = ? LIMIT 1",
+        [adminEmail]
+      );
+      if (adminRow) {
+        await pool.query(
+          "UPDATE users SET password = ?, role = 'admin' WHERE email = ?",
+          [adminHash, adminEmail]
+        );
+        console.log('[bootstrap] INFO: Admin password synced for ' + adminEmail);
+      } else {
+        await pool.query(
+          "INSERT INTO users (id, name, email, phone, password, role) VALUES (?, 'Site Admin', ?, NULL, ?, 'admin')",
+          [randomUUID(), adminEmail, adminHash]
+        );
+        console.log('[bootstrap] INFO: Admin user created: ' + adminEmail);
+      }
+    } else {
+      console.log('[bootstrap] WARN: Admin credentials not set, skipping admin user creation');
+    }
+
 
     // 4. Seed products if DB is empty
     const [[{ count }]] = await pool.query('SELECT COUNT(*) AS count FROM products');

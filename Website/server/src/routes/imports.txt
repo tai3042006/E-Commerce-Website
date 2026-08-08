@@ -1,0 +1,3 @@
+import addressesRouter     from './routes/addresses.js';
+import paymentMethodsRouter from './routes/paymentMethods.js';
+import settingsRouter      from './routes/settings.js';

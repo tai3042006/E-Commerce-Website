@@ -1,0 +1,3 @@
+app.use('/api',               addressesRouter);
+app.use('/api',               paymentMethodsRouter);
+app.use('/api',               settingsRouter);

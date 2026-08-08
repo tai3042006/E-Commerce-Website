@@ -3,8 +3,8 @@ import { Heart, Plus } from "lucide-react";
 import { Product } from "@/data/products";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useWishlist } from "@/context/WishlistContext";
-import { useCart } from "@/controllers/CartController";
+import { useWishlist } from "@/context/WishlistContext.hooks";
+import { useCart } from "@/controllers/CartController.hooks";
 import { toast } from "sonner";
 
 const badgeStyles: Record<string, string> = {
@@ -13,7 +13,7 @@ const badgeStyles: Record<string, string> = {
   bestseller: "bg-secondary text-foreground border border-border",
 };
 
-export const ProductCard = ({ product }: { product: Product }) => {
+export const ProductCard = ({ product, className }: { product: Product; className?: string }) => {
   const { has, toggle } = useWishlist();
   const { add } = useCart();
   const [hover, setHover] = useState(false);
@@ -35,7 +35,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <motion.article
-      className="group"
+      className={className ? `group ${className}` : "group"}
       onHoverStart={() => setHover(true)}
       onHoverEnd={() => setHover(false)}
     >

@@ -1,15 +1,7 @@
 import 'dotenv/config';
 import { getPool } from './db.js';
 import { randomUUID } from 'node:crypto';
-
-function simpleHash(plain) {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < plain.length; i++) {
-    h ^= plain.charCodeAt(i);
-    h = (h * 0x01000193) >>> 0;
-  }
-  return h.toString(16).padStart(8, '0') + plain.length.toString(16);
-}
+import bcrypt from 'bcrypt';
 
 async function columnExists(pool, table, column) {
   const [[row]] = await pool.query(`
@@ -22,7 +14,7 @@ async function columnExists(pool, table, column) {
 async function ensureColumn(pool, table, column, definition) {
   if (!(await columnExists(pool, table, column))) {
     await pool.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
-    console.log(`[migrate] ✓ Added column ${table}.${column}`);
+    console.log(`[migrate] ����� ��� ��� ��� � ��� � � � ✓ Added column ${table}.${column}`);
   } else {
     console.log(`[migrate] – ${table}.${column} already exists`);
   }
@@ -33,10 +25,10 @@ const pool = await getPool();
 // 1. users.role
 if (!(await columnExists(pool, 'users', 'role'))) {
   await pool.query(`ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'customer' AFTER password`);
-  console.log('[migrate] ✓ Added role column to users');
+  console.log('[migrate] ����� ��� ��� ��� ��� � ��� � � � � ✓ Added role column to users');
 } else {
   await pool.query(`ALTER TABLE users MODIFY COLUMN role VARCHAR(20) NOT NULL DEFAULT 'customer'`);
-  console.log('[migrate] ✓ role column type fixed to VARCHAR(20)');
+  console.log('[migrate] ����� ��� ��� ��� ��� ��� � ��� � � � � � ✓ role column type fixed to VARCHAR(20)');
 }
 
 // 2. notifications — drop old schema (has `type`, missing `audience`) and recreate
@@ -73,28 +65,85 @@ await ensureColumn(pool, 'notifications', 'link',       'VARCHAR(300) NULL AFTER
 await ensureColumn(pool, 'notifications', 'is_read',    'TINYINT(1) NOT NULL DEFAULT 0 AFTER link');
 await ensureColumn(pool, 'notifications', 'created_at', 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER is_read');
 
-console.log('[migrate] ✓ notifications table ready');
+console.log('[migrate] ����� ��� ��� ��� ��� ��� � ��� � � � � � ✓ notifications table ready');
 
-// 3. Admin user
-const adminHash = simpleHash('admin123');
-console.log('[migrate] admin123 hash =', adminHash);
+// 3. addresses table
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS addresses (
+    id          VARCHAR(50)    NOT NULL,
+    customer_id VARCHAR(50)    NOT NULL,
+    full_name   VARCHAR(150)   NOT NULL,
+    phone       VARCHAR(50)    NOT NULL,
+    address_line VARCHAR(200)  NOT NULL,
+    city        VARCHAR(100)   NOT NULL,
+    is_default  TINYINT(1)     NOT NULL DEFAULT 0,
+    created_at  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_addresses_customer (customer_id),
+    CONSTRAINT fk_addresses_customer
+      FOREIGN KEY (customer_id) REFERENCES users(id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+  ) ENGINE=InnoDB
+`);
+console.log('[migrate] ����� ��� ��� ��� ��� ��� ��� ��� � ��� � � � � � � � ✓ addresses table ready');
 
-const [[existing]] = await pool.query(
-  "SELECT id FROM users WHERE email = 'admin@clofit.com' LIMIT 1"
-);
-if (existing) {
-  await pool.query(
-    "UPDATE users SET password = ?, role = 'admin', name = 'Site Admin' WHERE email = 'admin@clofit.com'",
-    [adminHash]
-  );
-  console.log('[migrate] ✓ Admin password reset  →  admin@clofit.com / admin123');
-} else {
-  await pool.query(
-    "INSERT INTO users (id, name, email, phone, password, role) VALUES (?, 'Site Admin', 'admin@clofit.com', NULL, ?, 'admin')",
-    [randomUUID(), adminHash]
-  );
-  console.log('[migrate] ✓ Admin user created  →  admin@clofit.com / admin123');
-}
+// 4. payment_methods table
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS payment_methods (
+    id          VARCHAR(50)    NOT NULL,
+    customer_id VARCHAR(50)    NOT NULL,
+    card_brand  VARCHAR(20)    NOT NULL,
+    last4       VARCHAR(4)     NOT NULL,
+    expiry_month TINYINT      NOT NULL,
+    expiry_year  SMALLINT     NOT NULL,
+    is_default  TINYINT(1)     NOT NULL DEFAULT 0,
+    created_at  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_payment_customer (customer_id),
+    CONSTRAINT fk_payment_customer
+      FOREIGN KEY (customer_id) REFERENCES users(id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+  ) ENGINE=InnoDB
+`);
+console.log('[migrate] ����� ��� ��� ��� ��� ��� ��� ��� ��� ��� ��� ��� � ��� � � � � � � � � � � � ✓ payment_methods table ready');
+
+
+  // 5. Admin user
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const nodeEnv = process.env.NODE_ENV || 'development';
+
+  if (nodeEnv === 'production') {
+    if (!adminEmail || !adminPassword) {
+      throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set in production');
+    }
+  }
+
+  if (adminEmail && adminPassword) {
+    const adminHash = await bcrypt.hash(adminPassword, 10);
+    console.log('[migrate] admin hash =', adminHash);
+
+    const [[existing]] = await pool.query(
+      "SELECT id FROM users WHERE email = ? LIMIT 1",
+      [adminEmail]
+    );
+    if (existing) {
+      await pool.query(
+        "UPDATE users SET password = ?, role = 'admin', name = 'Site Admin' WHERE email = ?",
+        [adminHash, adminEmail]
+      );
+      console.log('[migrate] INFO: Admin password reset  ->  ' + adminEmail);
+    } else {
+      await pool.query(
+        "INSERT INTO users (id, name, email, phone, password, role) VALUES (?, 'Site Admin', ?, NULL, ?, 'admin')",
+        [randomUUID(), adminEmail, adminHash]
+      );
+      console.log('[migrate] INFO: Admin user created  ->  ' + adminEmail);
+    }
+  } else {
+    console.log('[migrate] WARN: Admin credentials not set, skipping admin user creation');
+  }
+
 
 await pool.end();
 console.log('[migrate] Done.');

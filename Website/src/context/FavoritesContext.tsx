@@ -1,21 +1,5 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { Product } from "@/data/products";
-
-type FavoritesContextType = {
-  favorites: Product[];
-  toggleFavorite: (product: Product) => void;
-  isFavorite: (productId: string) => boolean;
-};
-
-const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
-
-export const useFavorites = () => {
-  const context = useContext(FavoritesContext);
-  if (!context) {
-    throw new Error("useFavorites must be used within a FavoritesProvider");
-  }
-  return context;
-};
+import { useState, useEffect } from "react";
+import { FavoritesContext, type FavoritesContextType, useFavorites } from "./FavoritesContext.hooks";
 
 export const FavoritesProvider = ({ children }: { children: React.ReactNode }) => {
   const [favorites, setFavorites] = useState<Product[]>([]);

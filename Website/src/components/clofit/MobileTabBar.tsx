@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { Home, Store, Heart, ShoppingBag, User } from "lucide-react";
-import { useCart } from "@/controllers/CartController";
+import { useCart } from "@/controllers/CartController.hooks";
 
 const tabs = [
   { to: "/", label: "Home", icon: Home, end: true },

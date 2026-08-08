@@ -1,15 +1,5 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useMemo } from "react";
-
-type Ctx = {
-  ids: string[];
-  has: (id: string) => boolean;
-  toggle: (id: string) => void;
-  remove: (id: string) => void;
-  clear: () => void;
-};
-
-const WishlistContext = createContext<Ctx | null>(null);
-const KEY = "clofit:wishlist";
+import { useEffect, useState, useMemo, ReactNode } from "react";
+import { WishlistContext, type Ctx, useWishlist, KEY } from "./WishlistContext.hooks";
 
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
   const [ids, setIds] = useState<string[]>(() => {
@@ -28,10 +18,4 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
   }), [ids]);
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
-};
-
-export const useWishlist = () => {
-  const ctx = useContext(WishlistContext);
-  if (!ctx) throw new Error("useWishlist must be used within WishlistProvider");
-  return ctx;
 };

@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, ArrowUpRight, Clock, TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useUI } from "@/context/UIContext";
+import { useUI } from "@/context/UIContext.hooks";
 import { products } from "@/data/products";
 
 const KEY = "clofit:recent-searches";

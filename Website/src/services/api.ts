@@ -8,7 +8,7 @@ export const authHeaders = () => ({
 });
 
 /** Thin wrapper around fetch that attaches the auth token and parses JSON. */
-export async function apiFetch<T = any>(url: string, options: RequestInit = {}): Promise<T> {
+export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
   const r = await fetch(url, {
     ...options,
     headers: { ...authHeaders(), ...(options.headers ?? {}) },
