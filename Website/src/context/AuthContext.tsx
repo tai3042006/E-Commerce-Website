@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, ReactNode } from "react";
 import { AuthContext, User, AuthApiResponse, AuthCtx, TOKEN_KEY, getToken, setToken, clearToken, safeJson, authHeaders, useAuth } from "./AuthContext.hooks";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
