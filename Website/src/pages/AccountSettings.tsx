@@ -23,7 +23,7 @@ import {
   Separator,
 } from "@/components/ui/separator";
 import {
-  Toast,
+  Toaster,
 } from "@/components/ui/toaster";
 
 const AccountSettings = () => {
@@ -122,58 +122,46 @@ const AccountSettings = () => {
         {/* Profile Form */}
         <div className="mt-6">
           <h2 className="mb-4 text-base font-semibold">Profile</h2>
-          <Form onSubmit={handleProfileSubmit}>
-            <FormControl>
-              <FormField>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your name"
-                    value={profileData.name}
-                    onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                    required
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormField>
-            </FormControl>
-            <FormControl>
-              <FormField>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={profileData.email}
-                    onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                    required
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormField>
-            </FormControl>
-            <FormControl>
-              <FormField>
-                <FormLabel>Phone Number</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your phone number"
-                    value={profileData.phone}
-                    onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormField>
-            </FormControl>
-            <FormControl>
-              <FormLabel>&nbsp;</FormLabel>
-              <FormControl>
-                <Button type="submit" variant="default" disabled={profileLoading} className="w-full">
-                  {profileLoading ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </FormControl>
-            </FormControl>
-          </Form>
+          <form onSubmit={handleProfileSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                placeholder="Enter your name"
+                value={profileData.name}
+                onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={profileData.email}
+                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                placeholder="Enter your phone number"
+                value={profileData.phone}
+                onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+              />
+            </div>
+
+            <div className="pt-4">
+              <Button type="submit" variant="default" disabled={profileLoading} className="w-full">
+                {profileLoading ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </form>
         </div>
 
         <Separator className="my-6" />
@@ -181,47 +169,38 @@ const AccountSettings = () => {
         {/* Password Form */}
         <div className="mt-6">
           <h2 className="mb-4 text-base font-semibold">Change Password</h2>
-          <Form onSubmit={handlePasswordSubmit}>
-            <FormControl>
-              <FormField>
-                <FormLabel>Current Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter your current password"
-                    value={passwordData.old_password}
-                    onChange={(e) => setPasswordData({ ...passwordData, old_password: e.target.value })}
-                    required
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormField>
-            </FormControl>
-            <FormControl>
-              <FormField>
-                <FormLabel>New Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter your new password"
-                    value={passwordData.new_password}
-                    onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
-                    required
-                    minLength={6}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormField>
-            </FormControl>
-            <FormControl>
-              <FormLabel>&nbsp;</FormLabel>
-              <FormControl>
-                <Button type="submit" variant="default" disabled={passwordLoading} className="w-full">
-                  {passwordLoading ? 'Changing...' : 'Change Password'}
-                </Button>
-              </FormControl>
-            </FormControl>
-          </Form>
+          <form onSubmit={handlePasswordSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="old_password">Current Password</Label>
+              <Input
+                id="old_password"
+                type="password"
+                placeholder="Enter your current password"
+                value={passwordData.old_password}
+                onChange={(e) => setPasswordData({ ...passwordData, old_password: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="new_password">New Password</Label>
+              <Input
+                id="new_password"
+                type="password"
+                placeholder="Enter your new password"
+                value={passwordData.new_password}
+                onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
+                required
+                minLength={6}
+              />
+            </div>
+
+            <div className="pt-4">
+              <Button type="submit" variant="default" disabled={passwordLoading} className="w-full">
+                {passwordLoading ? 'Changing...' : 'Change Password'}
+              </Button>
+            </div>
+          </form>
           <p className="mt-2 text-xs text-muted-foreground">
             Your new password must be at least 6 characters long.
           </p>

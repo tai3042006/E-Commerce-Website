@@ -50,7 +50,13 @@ const SignUp = () => {
             { ph: "Password",  type: "password", k: "password", req: true },
             { ph: "Confirm Password", type: "password", k: "confirm", req: true },
           ].map(f => (
-            <input key={f.k} type={f.type} placeholder={f.ph} value={form[f.k]} onChange={set(f.k)} required={f.req}
+            <input
+              key={f.k as keyof FormValues}
+              type={f.type}
+              placeholder={f.ph}
+              value={form[f.k as keyof FormValues]}
+              onChange={set(f.k as keyof FormValues)}
+              required={f.req}
               className="w-full rounded-xl border border-input bg-background px-4 py-3.5 text-sm placeholder:text-muted-foreground focus:border-foreground focus:outline-none" />
           ))}
           <button type="submit" disabled={loading}

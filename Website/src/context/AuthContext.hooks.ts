@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 
 export type User = { id: string; name: string; email: string; phone?: string; role: string };
-export type AuthApiResponse = { token: string; user: User } | { error?: string };
+export type AuthApiResponse = { token: string; user: User; error?: undefined } | { error?: string };
 export type AuthCtx = {
   user: User | null;
   loading: boolean;

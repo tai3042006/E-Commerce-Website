@@ -20,27 +20,10 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Button,
-  ButtonVariant,
-} from "@/components/ui/button";
-import {
-  Input,
-} from "@/components/ui/input";
-import {
-  Label,
-} from "@/components/ui/label";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Toast,
-} from "@/components/ui/toaster";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Toaster } from "@/components/ui/toaster";
 
 interface Address {
   id: string;
@@ -196,7 +179,7 @@ const AccountAddresses = () => {
       phone: address.phone || '',
       address_line: address.address_line || '',
       city: address.city || '',
-      is_default: address.is_default === 1 || address.is_default === true,
+      is_default: Boolean(address.is_default),
     });
     setModalOpen(true);
   };
@@ -266,7 +249,6 @@ const AccountAddresses = () => {
                     </Button>
                     <Button
                       variant="destructive"
-                      ghost
                       size="icon"
                       onClick={() => handleDelete(addr.id)}
                       aria-label="Delete address"
@@ -304,81 +286,70 @@ const AccountAddresses = () => {
                 Fill in the address details below.
               </DialogDescription>
             </DialogHeader>
-            <Form onSubmit={handleSubmit}>
-              <FormControl>
-                <FormField>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="John Doe"
-                      value={formData.full_name}
-                      onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormField>
-              </FormControl>
-              <FormControl>
-                <FormField>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="+1 (555) 123-4567"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormField>
-              </FormControl>
-              <FormControl>
-                <FormField>
-                  <FormLabel>Address Line</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="123 Main St"
-                      value={formData.address_line}
-                      onChange={(e) => setFormData({ ...formData, address_line: e.target.value })}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormField>
-              </FormControl>
-              <FormControl>
-                <FormField>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="New York"
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormField>
-              </FormControl>
-              <FormControl>
-                <FormField>
-                  <FormLabel>Set as default address</FormLabel>
-                  <FormControl>
-                    <Input
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="full_name">Full Name</Label>
+                  <Input
+                    id="full_name"
+                    placeholder="John Doe"
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    placeholder="+1 (555) 123-4567"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address_line">Address Line</Label>
+                  <Input
+                    id="address_line"
+                    placeholder="123 Main St"
+                    value={formData.address_line}
+                    onChange={(e) => setFormData({ ...formData, address_line: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    placeholder="New York"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      id="is_default"
                       type="checkbox"
                       checked={formData.is_default}
                       onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
+                      className="h-4 w-4"
                     />
-                  </FormControl>
-                  <FormDescription>
+                    <Label htmlFor="is_default" className="cursor-pointer ml-2">
+                      Set as default address
+                    </Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
                     If checked, this address will be used as the default for checkout.
-                  </FormDescription>
-                </FormField>
-              </FormControl>
-              <FormControl>
-                <FormLabel>&nbsp;</FormLabel>
-                <FormControl>
+                  </p>
+                </div>
+
+                <div className="pt-4">
                   <Button type="submit" variant="default" className="w-full">
                     {modalType === 'add' ? 'Add Address' : 'Save Changes'}
                   </Button>
@@ -400,9 +371,8 @@ const AccountAddresses = () => {
                   >
                     Cancel
                   </Button>
-                </FormControl>
-              </FormControl>
-            </Form>
+                </div>
+              </form>
           </DialogContent>
         </Dialog>
       </section>

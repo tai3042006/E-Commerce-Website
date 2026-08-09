@@ -1,5 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, ReactNode } from "react";
+import { toast } from "sonner";
+import { useAuth } from "./AuthContext";
 import { NotifContext, type Notification, type NotifCtx, useNotifications, TOKEN_KEY, getToken, authHeaders, POLL_MS } from "./NotificationContext.hooks";
+
+export { useNotifications };
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();

@@ -16,7 +16,7 @@ import {
   Checkbox,
 } from "@/components/ui/checkbox";
 import {
-  Toast,
+  Toaster,
 } from "@/components/ui/toaster";
 
 type Notification = {

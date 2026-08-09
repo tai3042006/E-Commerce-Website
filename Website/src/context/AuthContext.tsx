@@ -1,114 +1,47 @@
-import { useState, useEffect, useCallback, ReactNode } from "react";
-import { AuthContext, User, AuthApiResponse, AuthCtx, TOKEN_KEY, getToken, setToken, clearToken, safeJson, authHeaders, useAuth } from "./AuthContext.hooks";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  // Restore session on mount
-  useEffect(() => {
-    const token = getToken();
-    if (!token) { setLoading(false); return; }
-    fetch("/api/auth/me", { headers: { "x-auth-token": token } })
-      .then(r => r.ok ? r.json() : null)
-      .then(u => { if (u) setUser(u); else clearToken(); })
-      .catch(() => clearToken())
-      .finally(() => setLoading(false));
-  }, []);
-
-  const login = useCallback(async (email: string, password: string) => {
-    let r: Response;
-    try {
-      r = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-    } catch {
-      throw new Error("Cannot connect to server. Please make sure the backend is running on port 4000.");
-    }
-    const data = await safeJson(r);
-    if (!r.ok) {
-      throw new Error(
-        data.error === "invalid_credentials"
-          ? "Invalid email or password"
-          : (data.error ?? "Login failed")
-      );
-    }
-    // r.ok is true → data must be { token: string; user: User }
-    const { token, user } = data as { token: string; user: User };
-    setToken(token);
-    setUser(user);
-  }, []);
-
-  const register = useCallback(async (name: string, email: string, phone: string, password: string) => {
-    let r: Response;
-    try {
-      r = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, password }),
-      });
-    } catch {
-      throw new Error("Cannot connect to server. Please make sure the backend is running on port 4000.");
-    }
-    const data = await safeJson(r);
-    if (!r.ok) {
-      throw new Error(
-        data.error === "email_taken"
-          ? "Email is already registered"
-          : (data.error ?? "Registration failed")
-      );
-    }
-    // r.ok is true → data must be { token: string; user: User }
-    const { token, user } = data as { token: string; user: User };
-    setToken(token);
-    setUser(user);
-  }, []);
-
-  const logout = useCallback(async () => {
-    const token = getToken();
-    if (token) {
-      try {
-        await fetch("/api/auth/logout", { method: "POST", headers: { "x-auth-token": token } });
-      } catch {
-        // ignore error
-      }
-    }
-    clearToken();
-    setUser(null);
-  }, []);
-
-  const forgotPassword = useCallback(async (email: string) => {
-    const r = await fetch("/api/auth/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    const data = await safeJson(r);
-    if (!r.ok) {
-      throw new Error(data.error ?? "Forgot password failed");
-    }
-  }, []);
-
-  const resetPassword = useCallback(async (token: string, password: string) => {
-    const r = await fetch("/api/auth/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password }),
-    });
-    const data = await safeJson(r);
-    if (!r.ok) {
-      throw new Error(data.error ?? "Reset password failed");
-    }
-  }, []);
-
-  const updateUser = useCallback((u: User) => setUser(u), []);
-
-  return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, forgotPassword, resetPassword, updateUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
+export type User = { id: string; name: string; email: string; phone?: string; role: string };
+export type AuthApiResponse = { token: string; user: User; error?: undefined } | { error?: string };
+export type AuthCtx = {
+  user: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, phone: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  updateUser: (u: User) => void;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (token: string, password: string) => Promise<void>;
 };
 
+export const AuthContext = createContext<AuthCtx | null>(null);
+
+export const TOKEN_KEY = "clofit:token";
+export const getToken = () => localStorage.getItem(TOKEN_KEY);
+export const setToken = (t: string) => localStorage.setItem(TOKEN_KEY, t);
+export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
+
+/** Safely parse JSON — never throws on empty body or HTML error pages */
+export async function safeJson(r: Response): Promise<AuthApiResponse> {
+  const text = await r.text();
+  if (!text.trim()) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    // Server returned HTML (502 proxy / nginx) or plain text
+    if (r.status === 0 || !r.status) {
+      return { error: "Cannot connect to server. Please make sure the backend is running." };
+    }
+    return { error: `Server error (${r.status}) — backend may be down or misconfigured.` };
+  }
+}
+
+export const authHeaders = () => ({
+  "Content-Type": "application/json",
+  ...(getToken() ? { "x-auth-token": getToken()! } : {}),
+});
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
+};
