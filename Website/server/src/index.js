@@ -3,12 +3,15 @@ import express from 'express';
 import cors from 'cors';
 import { randomUUID } from 'node:crypto';
 import { getPool } from './db.js';
-import productsRouter      from './routes/products.js';
-import customersRouter     from './routes/customers.js';
-import ordersRouter        from './routes/orders.js';
-import authRouter          from './routes/auth.js';
-import notificationsRouter from './routes/notifications.js';
-import reviewsRouter       from './routes/reviews.js';
+import productsRouter        from './routes/products.js';
+import customersRouter       from './routes/customers.js';
+import ordersRouter          from './routes/orders.js';
+import authRouter            from './routes/auth.js';
+import notificationsRouter   from './routes/notifications.js';
+import reviewsRouter         from './routes/reviews.js';
+import addressesRouter       from './routes/addresses.js';
+import paymentMethodsRouter  from './routes/paymentMethods.js';
+import settingsRouter        from './routes/settings.js';
 import bcrypt from 'bcrypt';
 
 const app  = express();
@@ -25,6 +28,9 @@ app.use('/api',               ordersRouter);
 app.use('/api/auth',          authRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api',               reviewsRouter);
+app.use('/api/addresses',       addressesRouter);
+app.use('/api/payment-methods', paymentMethodsRouter);
+app.use('/api/settings',        settingsRouter);
 
 app.use((err, _req, res, _next) => {
   console.error('[server] error:', err.message);

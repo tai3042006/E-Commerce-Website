@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
+import { Product } from "@/data/products";
 import { FavoritesContext, type FavoritesContextType, useFavorites } from "./FavoritesContext.hooks";
+
+export { useFavorites };
 
 export const FavoritesProvider = ({ children }: { children: React.ReactNode }) => {
   const [favorites, setFavorites] = useState<Product[]>([]);

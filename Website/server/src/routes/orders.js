@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { randomUUID } from 'node:crypto';
 import { getPool } from '../db.js';
-import { requireAuth } from './auth.js';
+import { requireAuth, requireAdmin } from './auth.js';
 
 const router = Router();
 
 // ── Export: revenue report as CSV ─────────────────────────────────────────────
 
-router.get('/orders/export', async (req, res, next) => {
+router.get('/orders/export', requireAdmin, async (req, res, next) => {
   try {
     const { from, to, status } = req.query;
     const pool = await getPool();
@@ -63,7 +63,7 @@ router.get('/orders/export', async (req, res, next) => {
   }
 });
 
-router.get('/orders', async (_req, res, next) => {
+router.get('/orders', requireAdmin, async (_req, res, next) => {
   try {
     const pool = await getPool();
     const [rows] = await pool.query(
@@ -130,12 +130,39 @@ router.post('/orders', async (req, res, next) => {
 
     const pool = await getPool();
 
+    // Recompute prices from the database — never trust client-supplied prices/totals.
+    const productIds = items.map((i) => i?.id);
+    if (!productIds.every((id) => typeof id === 'string' && id)) {
+      return res.status(400).json({ error: 'each item must have a valid product id' });
+    }
+    const [productRows] = await pool.query(
+      'SELECT id, name, price, in_stock FROM products WHERE id IN (?)',
+      [productIds]
+    );
+    const productById = Object.fromEntries(productRows.map((p) => [p.id, p]));
+
+    const resolvedItems = [];
+    for (const item of items) {
+      const product = productById[item.id];
+      const qty = Number(item.qty);
+      if (!product) {
+        return res.status(400).json({ error: `unknown product: ${item.id}` });
+      }
+      if (!Number.isInteger(qty) || qty < 1) {
+        return res.status(400).json({ error: `invalid quantity for product: ${item.id}` });
+      }
+      if (!product.in_stock) {
+        return res.status(400).json({ error: `product out of stock: ${item.id}` });
+      }
+      resolvedItems.push({ id: product.id, name: product.name, price: Number(product.price), qty });
+    }
+
     let [[cust]] = await pool.query(
       'SELECT id FROM customers WHERE email = ?',
       [customer.email]
     );
     let customerId;
-    const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+    const total = resolvedItems.reduce((s, i) => s + i.price * i.qty, 0);
     if (cust) {
       customerId = cust.id;
       await pool.query(
@@ -152,8 +179,8 @@ router.post('/orders', async (req, res, next) => {
     }
 
     const orderId = 'CF-' + Date.now().toString().slice(-5);
-    const summary = items[0]?.name ?? '';
-    const count   = items.reduce((s, i) => s + i.qty, 0);
+    const summary = resolvedItems[0]?.name ?? '';
+    const count   = resolvedItems.reduce((s, i) => s + i.qty, 0);
 
     await pool.query(
       `INSERT INTO orders (id, customer_id, order_date, total, status, product_summary, items_count, address, city, zip, country)
@@ -184,7 +211,7 @@ router.post('/orders', async (req, res, next) => {
   }
 });
 
-router.patch('/orders/:id/status', async (req, res, next) => {
+router.patch('/orders/:id/status', requireAdmin, async (req, res, next) => {
   try {
     const { status } = req.body;
     const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];

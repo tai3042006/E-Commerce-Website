@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowDownRight, ArrowUpRight, DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAuth } from "@/context/AuthContext.hooks";
+import { authHeaders } from "@/context/AuthContext.hooks";
 import { statusStyles } from "@/data/admin";
 
 type Order    = { id: string; customer: string; total: number; status: string; date: string; product: string };
@@ -17,8 +18,8 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/orders").then(r => r.json()),
-      fetch("/api/customers").then(r => r.json()),
+      fetch("/api/orders", { headers: authHeaders() }).then(r => r.json()),
+      fetch("/api/customers", { headers: authHeaders() }).then(r => r.json()),
       fetch("/api/products").then(r => r.json()),
     ]).then(([o, c, p]) => {
       setOrders(o);

@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { CartContext, type Ctx, useCart } from "./CartContext.hooks";
 import { cartService } from "@/services/CartService";
+
+export { useCart };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<Ctx>(() => {

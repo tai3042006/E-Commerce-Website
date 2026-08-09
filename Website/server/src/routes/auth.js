@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, randomBytes, createHash } from 'node:crypto';
 import { getPool } from '../db.js';
 import bcrypt from 'bcrypt';
 
@@ -71,6 +71,29 @@ async function deleteSession(token) {
     await pool.query('DELETE FROM sessions WHERE token = ?', [token]);
   } catch {}
 }
+
+// ── Password reset tokens ───────────────────────────────────────────────────
+// The token itself is only ever shown to the requester once (link / dev log);
+// only its SHA-256 hash is stored, so a DB leak alone can't be used to reset
+// an account's password.
+
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+async function ensurePasswordResetsTable(pool) {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS password_resets (
+      token_hash CHAR(64)     NOT NULL,
+      user_id    VARCHAR(50)  NOT NULL,
+      expires_at DATETIME     NOT NULL,
+      used       TINYINT(1)   NOT NULL DEFAULT 0,
+      created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (token_hash),
+      KEY idx_reset_user (user_id)
+    ) ENGINE=InnoDB
+  `);
+}
+
+const hashResetToken = (token) => createHash('sha256').update(token).digest('hex');
 
 export async function requireAuth(req, res, next) {
   const token = req.headers['x-auth-token'];
@@ -199,6 +222,74 @@ router.post('/login', async (req, res, next) => {
     }
     const token = await createSession(user.id, user.role);
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/forgot-password', async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'email is required' });
+    }
+    const pool = await getPool();
+    await ensurePasswordResetsTable(pool);
+
+    const [[user]] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+
+    // Always respond the same way whether or not the email exists, so this
+    // endpoint can't be used to enumerate which emails are registered.
+    if (user) {
+      const token = randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+      await pool.query(
+        'INSERT INTO password_resets (token_hash, user_id, expires_at) VALUES (?, ?, ?)',
+        [hashResetToken(token), user.id, expiresAt]
+      );
+      // No email service is configured for this project — log the reset link
+      // so it can be used during development/testing instead of being lost.
+      console.log(`[auth] Password reset link for ${email}: /reset-password?token=${token}`);
+    }
+
+    res.json({ ok: true, message: 'If the email exists, a reset link has been sent.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/reset-password', async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ error: 'token and password are required' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'password must be at least 6 characters' });
+    }
+
+    const pool = await getPool();
+    await ensurePasswordResetsTable(pool);
+
+    const tokenHash = hashResetToken(token);
+    const [[reset]] = await pool.query(
+      'SELECT user_id, expires_at, used FROM password_resets WHERE token_hash = ?',
+      [tokenHash]
+    );
+
+    if (!reset || reset.used || new Date(reset.expires_at) < new Date()) {
+      return res.status(400).json({ error: 'invalid_or_expired_token' });
+    }
+
+    const newHash = await bcrypt.hash(password, 10);
+    await pool.query('UPDATE users SET password = ? WHERE id = ?', [newHash, reset.user_id]);
+    await pool.query('UPDATE password_resets SET used = 1 WHERE token_hash = ?', [tokenHash]);
+
+    // Invalidate existing sessions so a stolen-but-now-reset account is logged out.
+    await ensureSessionsTable(pool);
+    await pool.query('DELETE FROM sessions WHERE user_id = ?', [reset.user_id]);
+
+    res.json({ ok: true });
   } catch (err) {
     next(err);
   }

@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { OrderContext } from "./OrderContext.hooks";
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => (

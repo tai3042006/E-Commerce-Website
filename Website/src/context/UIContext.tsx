@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState, ReactNode } from "react";
 import { UIContext, type Ctx, useUI } from "./UIContext.hooks";
 
+export { useUI };
+
 export const UIProvider = ({ children }: { children: ReactNode }) => {
   const [searchOpen, setSearch] = useState(false);
   const [cartOpen, setCart] = useState(false);

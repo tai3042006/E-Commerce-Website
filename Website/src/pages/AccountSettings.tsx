@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext.hooks";
+import { authHeaders } from "@/context/AuthContext.hooks";
 import { Layout } from "@/components/clofit/Layout";
 import { Breadcrumbs } from "@/components/clofit/Breadcrumbs";
 import {
@@ -75,28 +77,27 @@ const AccountSettings = () => {
     e.preventDefault();
     setPasswordLoading(true);
     try {
-      const token = localStorage.getItem('clofit:token');
       const res = await fetch('/api/settings/password', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token || '',
-        },
+        headers: authHeaders(),
         body: JSON.stringify(passwordData),
       });
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to change password');
+        throw new Error(
+          errorData.error === 'invalid_old_password'
+            ? 'Current password is incorrect'
+            : (errorData.error || 'Failed to change password')
+        );
       }
       // Clear the form
       setPasswordData({
         old_password: '',
         new_password: '',
       });
-      // TODO: show success toast
+      toast.success('Password changed successfully');
     } catch (err) {
-      console.error(err);
-      // TODO: show error toast
+      toast.error(err instanceof Error ? err.message : 'Failed to change password');
     } finally {
       setPasswordLoading(false);
     }

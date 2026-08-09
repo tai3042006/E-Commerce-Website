@@ -3,6 +3,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { statusStyles, OrderStatus } from "@/data/admin";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
+import { authHeaders } from "@/context/AuthContext.hooks";
 
 type ApiOrder = {
   id: string; customer: string; customerEmail: string;
@@ -11,9 +12,6 @@ type ApiOrder = {
 
 const filters: ("all" | OrderStatus)[] = ["all", "pending", "processing", "shipped", "delivered", "cancelled"];
 const ALL_STATUSES: OrderStatus[] = ["pending", "processing", "shipped", "delivered", "cancelled"];
-
-const TOKEN_KEY = "clofit:token";
-const getToken = () => localStorage.getItem(TOKEN_KEY);
 
 const AdminOrders = () => {
   const [orders, setOrders]   = useState<ApiOrder[]>([]);
@@ -28,7 +26,7 @@ const AdminOrders = () => {
       const params = new URLSearchParams();
       if (filter !== "all") params.set("status", filter);
       const url = `/api/orders/export${params.toString() ? "?" + params : ""}`;
-      const r = await fetch(url);
+      const r = await fetch(url, { headers: authHeaders() });
       if (!r.ok) throw new Error("Export failed");
       const blob = await r.blob();
       const a = document.createElement("a");
@@ -45,7 +43,7 @@ const AdminOrders = () => {
   };
 
   useEffect(() => {
-    fetch("/api/orders")
+    fetch("/api/orders", { headers: authHeaders() })
       .then(r => r.json())
       .then(setOrders)
       .catch(() => {})
@@ -55,13 +53,9 @@ const AdminOrders = () => {
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     setUpdatingId(orderId);
     try {
-      const token = getToken();
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (token) headers["x-auth-token"] = token;
-
       const r = await fetch(`/api/orders/${encodeURIComponent(orderId)}/status`, {
         method: "PATCH",
-        headers,
+        headers: authHeaders(),
         body: JSON.stringify({ status: newStatus }),
       });
       if (!r.ok) throw new Error("Update failed");

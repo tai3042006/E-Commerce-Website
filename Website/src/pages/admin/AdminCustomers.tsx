@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Mail, Search } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { authHeaders } from "@/context/AuthContext.hooks";
 
 type Customer = { id: string; name: string; email: string; joined: string; orders: number; spent: number; location: string };
 
@@ -11,7 +12,7 @@ const AdminCustomers = () => {
   const [q, setQ] = useState("");
 
   useEffect(() => {
-    fetch("/api/customers").then(r => r.json()).then(setCustomers).catch(() => {});
+    fetch("/api/customers", { headers: authHeaders() }).then(r => r.json()).then(setCustomers).catch(() => {});
   }, []);
 
   const list = customers.filter(c =>

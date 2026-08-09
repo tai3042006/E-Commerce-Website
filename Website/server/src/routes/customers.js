@@ -2,10 +2,11 @@
 
 import { Router } from 'express';
 import { getPool } from '../db.js';
+import { requireAdmin } from './auth.js';
 
 const router = Router();
 
-router.get('/customers', async (_req, res, next) => {
+router.get('/customers', requireAdmin, async (_req, res, next) => {
   try {
     const pool = await getPool();
     const [rows] = await pool.query(

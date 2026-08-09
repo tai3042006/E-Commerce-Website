@@ -43,6 +43,9 @@ const SignIn = () => {
             className="w-full rounded-xl border border-input bg-background px-4 py-3.5 text-sm placeholder:text-muted-foreground focus:border-foreground focus:outline-none" />
           <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required
             className="w-full rounded-xl border border-input bg-background px-4 py-3.5 text-sm placeholder:text-muted-foreground focus:border-foreground focus:outline-none" />
+          <div className="text-right">
+            <Link to="/forgot-password" className="text-xs font-semibold text-foreground hover:underline">Forgot password?</Link>
+          </div>
           <button type="submit" disabled={loading}
             className="w-full rounded-pill bg-foreground py-4 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-50">
             {loading ? "Signing in…" : "Sign In"}

@@ -16,8 +16,8 @@ type Review = {
 };
 
 type ReviewApiResponse =
-  | Review[]
-  | { product: { rating: number; reviews: number } }
+  | (Review[] & { error?: undefined })
+  | { product: { rating: number; reviews: number }; error?: undefined }
   | { error?: string };
 
 const TOKEN_KEY = "clofit:token";

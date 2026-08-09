@@ -32,6 +32,8 @@ const AccountDashboard  = lazy(() => import("./pages/Account"));
 const SearchPage        = lazy(() => import("./pages/Search"));
 const SignIn            = lazy(() => import("./pages/SignIn"));
 const SignUp            = lazy(() => import("./pages/SignUp"));
+const ForgotPassword    = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword     = lazy(() => import("./pages/ResetPassword"));
 const NotFound          = lazy(() => import("./pages/NotFound"));
 const AdminLogin        = lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard    = lazy(() => import("./pages/admin/Dashboard"));
@@ -99,6 +101,8 @@ const AnimatedRoutes = () => {
           <Route path="/favorites" element={<Navigate to="/wishlist" replace />} />
           <Route path="/signin" element={<Suspense fallback={null}><Page><SignIn /></Page></Suspense>} />
           <Route path="/signup" element={<Suspense fallback={null}><Page><SignUp /></Page></Suspense>} />
+          <Route path="/forgot-password" element={<Suspense fallback={null}><Page><ForgotPassword /></Page></Suspense>} />
+          <Route path="/reset-password" element={<Suspense fallback={null}><Page><ResetPassword /></Page></Suspense>} />
           <Route path="/admin/login" element={<Suspense fallback={null}><AdminLogin /></Suspense>} />
           <Route path="/admin" element={<Suspense fallback={null}><AdminRoute><AdminDashboard /></AdminRoute></Suspense>} />
           <Route path="/admin/products" element={<Suspense fallback={null}><AdminRoute><AdminProducts /></AdminRoute></Suspense>} />
