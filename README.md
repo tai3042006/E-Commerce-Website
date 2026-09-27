@@ -1,4 +1,4 @@
-# CloFit — E-Commerce Fashion Platform
+# CloFit — E-Commerce Fashion Platform (VIBE-CODING PROJECT)
 
 > A full-stack fashion e-commerce platform built with React + TypeScript (frontend) and Node.js + MySQL (backend), applying object-oriented design patterns: **Singleton**, **Observer**, **Strategy**.
 
