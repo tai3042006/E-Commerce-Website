@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useAuth } from "@/context/AuthContext.hooks";
-import { authHeaders } from "@/context/AuthContext.hooks";
+import { authHeaders, useAuth } from "@/context/AuthContext.hooks";
 import { Layout } from "@/components/clofit/Layout";
 import { Breadcrumbs } from "@/components/clofit/Breadcrumbs";
 import {
@@ -29,7 +28,7 @@ import {
 } from "@/components/ui/toaster";
 
 const AccountSettings = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [profileLoading, setProfileLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -47,26 +46,19 @@ const AccountSettings = () => {
     e.preventDefault();
     setProfileLoading(true);
     try {
-      const token = localStorage.getItem('clofit:token');
       const res = await fetch('/api/settings/profile', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token || '',
-        },
+        headers: authHeaders(),
         body: JSON.stringify(profileData),
       });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || 'Failed to update profile');
       }
-      const updatedUser = await res.json();
-      // Update the user in context? We'll rely on the auth context to refresh on next render.
-      // For now, we'll just show a success toast.
-      // TODO: show success toast
+      updateUser(await res.json());
+      toast.success('Profile updated successfully');
     } catch (err) {
-      console.error(err);
-      // TODO: show error toast
+      toast.error(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
       setProfileLoading(false);
     }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { toast } from "sonner";
-import { ProductCatalog } from "@/services/ProductCatalog";
+import { invalidateProducts } from "@/services/ProductCatalog";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -138,7 +138,8 @@ const AdminProducts = () => {
       if (imageFile) {
         const fd = new FormData();
         fd.append("image", imageFile);
-        const upRes = await fetch("/api/upload", { method: "POST", body: fd });
+        const { "x-auth-token": token } = authHeaders();
+        const upRes = await fetch("/api/upload", { method: "POST", body: fd, headers: token ? { "x-auth-token": token } : {} });
         if (!upRes.ok) throw new Error("Image upload failed");
         const upData = await upRes.json();
         imageUrl = upData.url;
@@ -179,7 +180,7 @@ const AdminProducts = () => {
         setProducts(prev => [saved, ...prev]);
       }
       // Invalidate the singleton cache so customers see the change immediately
-      ProductCatalog.getInstance().invalidate();
+      invalidateProducts();
       setShowModal(false);
       setEditingId(null);
       setForm(EMPTY_FORM);
@@ -203,7 +204,7 @@ const AdminProducts = () => {
       if (!r.ok) throw new Error("Delete failed");
       setProducts(prev => prev.filter(p => p.id !== id));
       // Invalidate the singleton cache so customers see the deletion immediately
-      ProductCatalog.getInstance().invalidate();
+      invalidateProducts();
       toast.success(`"${name}" deleted.`);
     } catch {
       toast.error("Could not delete product.");
@@ -221,7 +222,7 @@ const AdminProducts = () => {
         body: JSON.stringify({ in_stock: next }),
       });
       if (!r.ok) throw new Error("Failed to update stock status");
-      ProductCatalog.getInstance().invalidate();
+      invalidateProducts();
       toast.success(next ? `"${p.name}" is back in stock.` : `"${p.name}" marked out of stock.`);
     } catch {
       // Revert on failure

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Eye, EyeOff, ShieldCheck } from "lucide-react";
 
 const AdminLogin = () => {
-  const { login, user } = useAuth();
+  const { login, logout, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,19 +24,6 @@ const AdminLogin = () => {
   if (user?.role === "admin") {
     return null;
   }
-  if (user && user.role !== "admin") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-secondary/30 px-4">
-        <div className="w-full max-w-md rounded-2xl border border-destructive/30 bg-background p-8 text-center shadow-xl">
-          <ShieldCheck className="mx-auto mb-4 h-12 w-12 text-destructive" />
-          <h2 className="text-lg font-bold">Access Denied</h2>
-          <p className="mt-2 text-sm text-muted-foreground">You are logged in as a customer. Admin credentials are required.</p>
-          <Link to="/" className="mt-6 inline-block text-sm font-medium text-foreground underline">Back to store</Link>
-        </div>
-      </div>
-    );
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -47,9 +34,7 @@ const AdminLogin = () => {
       const r = await fetch("/api/auth/me", { headers: { "x-auth-token": token } });
       const u = await r.json();
       if (u.role !== "admin") {
-        await fetch("/api/auth/logout", { method: "POST", headers: { "x-auth-token": token } });
-        localStorage.removeItem("clofit:token");
-        window.location.reload();
+        await logout();
         throw new Error("Access denied. Admin privileges required.");
       }
       toast.success("Welcome, Admin!");

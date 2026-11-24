@@ -1,15 +1,8 @@
 import { createContext, useContext } from "react";
 import { Product } from "@/data/products";
-import { ProductCatalog } from "@/services/ProductCatalog";
-import { ProductFilterContext } from "@/filters/ProductFilterContext";
-
-export type FilterStrategy = Parameters<ProductFilterContext["setStrategy"]>[0];
-
-export type Ctx = {
+type Ctx = {
   products: Product[];
-  filteredProducts: Product[];
   loading: boolean;
-  setFilterStrategy: (strategy: FilterStrategy) => void;
 };
 
 export const ProductContext = createContext<Ctx | null>(null);

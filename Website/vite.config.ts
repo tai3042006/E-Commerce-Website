@@ -12,9 +12,9 @@
         overlay: false,
       },
       proxy: {
-        // Forward /api/* to the Express backend running on port 4000
+        // Forward /api/* to the Java backend running on port 4000
         '/api': {
-          target: 'http://localhost:4000',
+          target: process.env.API_PROXY_TARGET || 'http://localhost:4000',
           changeOrigin: true,
         },
       },
@@ -22,7 +22,7 @@
     plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "./src"),
+        "@": path.resolve(import.meta.dirname, "./src"),
       },
       dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
     },

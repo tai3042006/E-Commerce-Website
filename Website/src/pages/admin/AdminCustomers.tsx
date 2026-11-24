@@ -1,9 +1,10 @@
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Mail, Search } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { authHeaders } from "@/context/AuthContext.hooks";
 
-type Customer = { id: string; name: string; email: string; joined: string; orders: number; spent: number; location: string };
+type Customer = { id: string; name: string; email: string; joined: string; orders: number; spent: number; registered: number; location: string };
 
 const initials = (name: string) => name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
 
@@ -12,8 +13,29 @@ const AdminCustomers = () => {
   const [q, setQ] = useState("");
 
   useEffect(() => {
-    fetch("/api/customers", { headers: authHeaders() }).then(r => r.json()).then(setCustomers).catch(() => {});
+    fetch("/api/customers", { headers: authHeaders() }).then(async r => {
+        if (!r.ok) throw new Error("Failed to load admin data");
+        return r.json();
+      }).then(setCustomers).catch(() => toast.error("Could not load admin data"));
   }, []);
+
+  const [deleting, setDeleting] = useState<string | null>(null);
+  async function deleteCustomer(customer: Customer) {
+    if (!window.confirm(`Delete the account for ${customer.email}? They will be signed out. Their orders will stay in the store records.`)) return;
+    setDeleting(customer.id);
+    try {
+      const response = await fetch("/api/customers/" + encodeURIComponent(customer.id), {
+        method: "DELETE", headers: authHeaders(),
+      });
+      if (!response.ok) throw new Error();
+      setCustomers(previous => previous.filter(row => row.id !== customer.id));
+      toast.success("Customer account deleted.");
+    } catch {
+      toast.error("Could not delete this account. Please try again.");
+    } finally {
+      setDeleting(null);
+    }
+  }
 
   const list = customers.filter(c =>
     c.name.toLowerCase().includes(q.toLowerCase()) || c.email.toLowerCase().includes(q.toLowerCase())
@@ -43,6 +65,10 @@ const AdminCustomers = () => {
               <div className="rounded-xl bg-secondary/60 p-3"><p className="text-xs text-muted-foreground">Spent</p><p className="mt-0.5 font-semibold">${c.spent}</p></div>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">Joined {typeof c.joined === "string" ? c.joined.slice(0,10) : c.joined}</p>
+            {!!c.registered && <button disabled={deleting !== null} onClick={() => void deleteCustomer(c)}
+              className="mt-4 text-sm font-medium text-destructive hover:underline disabled:opacity-50">
+              {deleting === c.id ? "Deleting…" : "Delete account"}
+            </button>}
           </div>
         ))}
       </div>

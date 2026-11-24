@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { LayoutDashboard, Package, ShoppingCart, Users, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, QrCode, ArrowLeft } from "lucide-react";
 import { Logo } from "@/components/clofit/Logo";
 import { NotificationBell } from "@/components/clofit/NotificationBell";
 
 const navItems = [
+  { to: "/admin/payment-qr", label: "Payment QR", icon: QrCode },
   { to: "/admin",           label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/products",  label: "Products",  icon: Package },
   { to: "/admin/orders",    label: "Orders",    icon: ShoppingCart },

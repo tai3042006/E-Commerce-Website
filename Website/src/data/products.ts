@@ -1,8 +1,8 @@
-import hoodieWhite from "@/assets/product-hoodie-white.jpg";
-import hoodieNavy from "@/assets/product-hoodie-navy.jpg";
-import hoodieBlack from "@/assets/product-hoodie-black.jpg";
-import hoodieChill from "@/assets/product-hoodie-chill.jpg";
-import teeEye from "@/assets/product-tee-eye.jpg";
+const hoodieWhite = "/images/product-hoodie-white.jpg";
+const hoodieNavy = "/images/product-hoodie-navy.jpg";
+const hoodieBlack = "/images/product-hoodie-black.jpg";
+const hoodieChill = "/images/product-hoodie-chill.jpg";
+const teeEye = "/images/product-tee-eye.jpg";
 
 export type ProductCategory =
   | "hoodies"

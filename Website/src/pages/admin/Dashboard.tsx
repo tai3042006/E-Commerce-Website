@@ -1,11 +1,12 @@
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, DollarSign, Package, ShoppingCart, Users } from "lucide-react";
+import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAuth } from "@/context/AuthContext.hooks";
 import { authHeaders } from "@/context/AuthContext.hooks";
 import { statusStyles } from "@/data/admin";
 
-type Order    = { id: string; customer: string; total: number; status: string; date: string; product: string };
+type Order    = { displayId?: string; id: string; customer: string; total: number; status: string; date: string; product: string };
 type Customer = { id: string; name: string; email: string; location: string; orders: number; spent: number };
 type Product  = { id: string; name: string; image: string; price: number; reviews: number };
 
@@ -18,23 +19,32 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/orders", { headers: authHeaders() }).then(r => r.json()),
-      fetch("/api/customers", { headers: authHeaders() }).then(r => r.json()),
-      fetch("/api/products").then(r => r.json()),
+      fetch("/api/orders", { headers: authHeaders() }).then(async r => {
+        if (!r.ok) throw new Error("Failed to load admin data");
+        return r.json();
+      }),
+      fetch("/api/customers", { headers: authHeaders() }).then(async r => {
+        if (!r.ok) throw new Error("Failed to load admin data");
+        return r.json();
+      }),
+      fetch("/api/products").then(async r => {
+        if (!r.ok) throw new Error("Failed to load admin data");
+        return r.json();
+      }),
     ]).then(([o, c, p]) => {
       setOrders(o);
       setCustomers(c);
       setProducts(p);
-    }).catch(() => {}).finally(() => setLoading(false));
+    }).catch(() => toast.error("Could not load admin data")).finally(() => setLoading(false));
   }, []);
 
-  const revenue = orders.reduce((s, o) => s + Number(o.total), 0);
+  const revenue = orders.filter(o => o.status !== "awaiting_payment" && o.status !== "cancelled").reduce((sum, order) => sum + Number(order.total), 0);
 
   const stats = [
-    { label: "Revenue",   value: `$${revenue.toLocaleString()}`,  change: "+12.4%", up: true,  icon: DollarSign },
-    { label: "Orders",    value: orders.length.toString(),         change: "+8.1%",  up: true,  icon: ShoppingCart },
-    { label: "Customers", value: customers.length.toString(),      change: "+4.6%",  up: true,  icon: Users },
-    { label: "Products",  value: products.length.toString(),       change: "-1.2%",  up: false, icon: Package },
+    { label: "Revenue",   value: `$${revenue.toLocaleString()}`,  icon: DollarSign },
+    { label: "Orders",    value: orders.length.toString(),  icon: ShoppingCart },
+    { label: "Customers", value: customers.length.toString(),  icon: Users },
+    { label: "Products",  value: products.length.toString(), icon: Package },
   ];
 
   const recent      = orders.slice(0, 5);
@@ -56,10 +66,6 @@ const AdminDashboard = () => {
               <s.icon className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="mt-3 text-2xl font-bold">{loading ? "—" : s.value}</div>
-            <div className={`mt-1 flex items-center gap-1 text-xs font-medium ${s.up ? "text-emerald-600" : "text-red-600"}`}>
-              {s.up ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
-              {s.change} vs last month
-            </div>
           </div>
         ))}
       </div>
@@ -86,7 +92,7 @@ const AdminDashboard = () => {
                 )}
                 {!loading && recent.map(o => (
                   <tr key={o.id}>
-                    <td className="py-3 pr-4 font-medium">{o.id}</td>
+                    <td className="py-3 pr-4 font-medium">{o.displayId ?? o.id}</td>
                     <td className="py-3 pr-4 text-muted-foreground">{o.customer}</td>
                     <td className="py-3 pr-4 font-medium">${Number(o.total).toFixed(2)}</td>
                     <td className="py-3">

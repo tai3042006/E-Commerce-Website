@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -55,15 +56,14 @@ const AccountNotifications = () => {
       if (!res.ok) throw new Error('Failed to fetch notifications');
       const data = await res.json();
       totalRef.current = data.total;
-      hasMoreRef.current = notifications.length + (newPage === 0 ? 0 : data.items.length) < totalRef.current;
+      hasMoreRef.current = newPage * limit + data.items.length < totalRef.current;
       if (newPage === 0) {
         setNotifications(data.items);
       } else {
         setNotifications((prev) => [...prev, ...data.items]);
       }
     } catch (err) {
-      console.error(err);
-      // TODO: show error toast
+      toast.error("Failed to load notifications");
     } finally {
       setLoading(false);
       setFetchingMore(false);
@@ -87,8 +87,7 @@ const AccountNotifications = () => {
         prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
       );
     } catch (err) {
-      console.error(err);
-      // TODO: show error toast
+      toast.error("Failed to update notification");
     }
   };
 
@@ -108,8 +107,7 @@ const AccountNotifications = () => {
       // Update locally
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     } catch (err) {
-      console.error(err);
-      // TODO: show error toast
+      toast.error("Failed to update notifications");
     }
   };
 

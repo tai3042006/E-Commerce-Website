@@ -1,118 +1,68 @@
-import { CartItem } from "@/models/Cart";
-import { Product, getProduct } from "@/data/products";
-import { ProductCatalog } from "@/services/ProductCatalog";
+import type { CartItem } from "@/models/Cart";
+import { getProduct, type Product } from "@/data/products";
+import { getProductById } from "@/services/ProductCatalog";
 
-class CartService {
-  private static instance: CartService;
-  private items: CartItem[] = [];
-  private listeners: (() => void)[] = [];
+const CART_KEY = "clofit:cart";
+const listeners = new Set<() => void>();
 
-  private constructor() {
-    this.loadFromLocalStorage();
-  }
-
-  public static getInstance(): CartService {
-    if (!CartService.instance) {
-      CartService.instance = new CartService();
+function readCart(): CartItem[] {
+  try {
+    const saved: unknown = JSON.parse(localStorage.getItem(CART_KEY) ?? "[]");
+    if (Array.isArray(saved)) {
+      return saved.filter((item) => item && typeof item.id === "string" &&
+        typeof item.size === "string" && Number.isSafeInteger(item.qty) && item.qty > 0);
     }
-    return CartService.instance;
+  } catch {
+    // Unavailable storage falls back to a cart for the current session.
   }
-
-  private loadFromLocalStorage(): void {
-    if (typeof window === "undefined") return;
-    try {
-      const saved = localStorage.getItem("clofit:cart");
-      if (saved) {
-        this.items = JSON.parse(saved);
-      }
-    } catch {
-      this.items = [];
-    }
-    this.emitChange();
-  }
-
-  private saveToLocalStorage(): void {
-    try {
-      localStorage.setItem("clofit:cart", JSON.stringify(this.items));
-    } catch {
-      // ignore
-    }
-  }
-
-  private emitChange(): void {
-    this.listeners.forEach((listener) => listener());
-  }
-
-  public subscribe(listener: () => void): () => void {
-    this.listeners.push(listener);
-    return () => {
-      this.listeners = this.listeners.filter((l) => l !== listener);
-    };
-  }
-
-  public getItems(): CartItem[] {
-    return [...this.items];
-  }
-
-  public getCount(): number {
-    return this.items.reduce((sum, item) => sum + item.qty, 0);
-  }
-
-  /** Look up a product: try API-loaded catalog first, fall back to static data. */
-  private resolveProduct(id: string): Product | undefined {
-    const catalog = ProductCatalog.getInstance();
-    const fromApi = catalog.getProductById(id);
-    if (fromApi) return fromApi;
-    return getProduct(id);
-  }
-
-  public getSubtotal(): number {
-    return this.getDetailed().reduce((sum, { product, item }) => sum + product.price * item.qty, 0);
-  }
-
-  public getDetailed(): { item: CartItem; product: Product }[] {
-    return this.items
-      .map((it) => ({ item: it, product: this.resolveProduct(it.id)! }))
-      .filter((d): d is { item: CartItem; product: Product } => d.product !== undefined);
-  }
-
-  public add(product: Product, size: string, qty: number = 1): void {
-    const existing = this.items.find((x) => x.id === product.id && x.size === size);
-    if (existing) {
-      this.items = this.items.map((x) =>
-        x === existing ? { ...x, qty: x.qty + qty } : x
-      );
-    } else {
-      this.items = [...this.items, { id: product.id, size, qty }];
-    }
-    this.saveToLocalStorage();
-    this.emitChange();
-  }
-
-  public remove(id: string, size: string): void {
-    this.items = this.items.filter((x) => !(x.id === id && x.size === size));
-    this.saveToLocalStorage();
-    this.emitChange();
-  }
-
-  public setQty(id: string, size: string, qty: number): void {
-    if (qty <= 0) {
-      // Auto-remove when quantity reaches 0
-      this.remove(id, size);
-      return;
-    }
-    this.items = this.items.map((x) =>
-      x.id === id && x.size === size ? { ...x, qty } : x
-    );
-    this.saveToLocalStorage();
-    this.emitChange();
-  }
-
-  public clear(): void {
-    this.items = [];
-    this.saveToLocalStorage();
-    this.emitChange();
-  }
+  return [];
 }
 
-export const cartService = CartService.getInstance();
+let items = readCart();
+
+function saveCart(next: CartItem[]) {
+  items = next;
+  try {
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+  } catch {
+    // The current session can still use the cart.
+  }
+  listeners.forEach((listener) => listener());
+}
+
+function getDetailed() {
+  return items.flatMap((item) => {
+    const product = getProductById(item.id) ?? getProduct(item.id);
+    return product ? [{ item, product }] : [];
+  });
+}
+
+export const cartService = {
+  subscribe(listener: () => void) {
+    listeners.add(listener);
+    return () => { listeners.delete(listener); };
+  },
+  getItems: () => [...items],
+  getCount: () => items.reduce((sum, item) => sum + item.qty, 0),
+  getDetailed,
+  getSubtotal: () => getDetailed().reduce((sum, { product, item }) => sum + product.price * item.qty, 0),
+  add(product: Product, size: string, qty = 1) {
+    if (!Number.isSafeInteger(qty) || qty < 1) return;
+    const existing = items.find((item) => item.id === product.id && item.size === size);
+    saveCart(existing
+      ? items.map((item) => item === existing ? { ...item, qty: item.qty + qty } : item)
+      : [...items, { id: product.id, size, qty }]);
+  },
+  remove(id: string, size: string) {
+    saveCart(items.filter((item) => item.id !== id || item.size !== size));
+  },
+  setQty(id: string, size: string, qty: number) {
+    if (!Number.isSafeInteger(qty)) return;
+    if (qty <= 0) {
+      cartService.remove(id, size);
+      return;
+    }
+    saveCart(items.map((item) => item.id === id && item.size === size ? { ...item, qty } : item));
+  },
+  clear: () => saveCart([]),
+};

@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/clofit/Layout";
 import { Product as ProductType } from "@/data/products";
-import { ProductCatalog } from "@/services/ProductCatalog";
+import { loadProducts } from "@/services/ProductCatalog";
 import { ProductCard } from "@/components/clofit/ProductCard";
 import { ReviewsSection } from "@/components/clofit/ReviewsSection";
 import { useCart } from "@/controllers/CartController.hooks";
@@ -34,7 +34,7 @@ const Product = () => {
     setActive(0);
     setQty(1);
 
-    ProductCatalog.getInstance().loadProducts().then(all => {
+    loadProducts().then(all => {
       setAllProducts(all);
       const found = all.find(p => p.id === id) ?? null;
       setProduct(found);

@@ -1,35 +1,46 @@
 services:
   mysql:
     image: mysql:8
-    container_name: clofit-db
-    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${LOCAL_DB_PASSWORD:-clofit-local}
       MYSQL_DATABASE: clofit
     ports:
-      - "3307:3306"
-
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - clofit-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
   backend:
-    build: ./server
-    container_name: clofit-api
-    restart: always
-    depends_on:
-      - mysql
-    ports:
-      - "4000:4000"
-    environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: clofit
-      AUTO_CREATE_DB: true
-
-  frontend:
     build: .
-    container_name: clofit-web
-    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      JDBC_DATABASE_URL: jdbc:mysql://mysql:3306/clofit
+      DB_USER: root
+      DB_PASSWORD: ${LOCAL_DB_PASSWORD:-clofit-local}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      STORE_URL: ${STORE_URL:-}
+      USD_VND_RATE: ${USD_VND_RATE:-0}
+      PAYOS_CLIENT_ID: ${PAYOS_CLIENT_ID:-}
+      PAYOS_API_KEY: ${PAYOS_API_KEY:-}
+      PAYOS_CHECKSUM_KEY: ${PAYOS_CHECKSUM_KEY:-}
+    ports:
+      - "127.0.0.1:4000:4000"
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
     depends_on:
       - backend
+    environment:
+      API_PROXY_TARGET: http://backend:4000
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  clofit-data:

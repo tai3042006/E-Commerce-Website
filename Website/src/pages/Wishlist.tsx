@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 import { Layout } from "@/components/clofit/Layout";
 import { ProductCard } from "@/components/clofit/ProductCard";
 import { useWishlist } from "@/context/WishlistContext.hooks";
-import { ProductCatalog } from "@/services/ProductCatalog";
+import { loadProducts } from "@/services/ProductCatalog";
 import { Product } from "@/data/products";
 
 const Wishlist = () => {
   const { ids, clear } = useWishlist();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
 
-  useEffect(() => { ProductCatalog.getInstance().loadProducts().then(setAllProducts); }, []);
+  useEffect(() => { loadProducts().then(setAllProducts); }, []);
 
   const items = allProducts.filter(p => ids.includes(p.id));
 

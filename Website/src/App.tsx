@@ -37,12 +37,12 @@ const ResetPassword     = lazy(() => import("./pages/ResetPassword"));
 const NotFound          = lazy(() => import("./pages/NotFound"));
 const AdminLogin        = lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard    = lazy(() => import("./pages/admin/Dashboard"));
+const AdminPaymentQr = lazy(() => import("./pages/admin/AdminPaymentQr"));
 const AdminProducts     = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminOrders       = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminCustomers    = lazy(() => import("./pages/admin/AdminCustomers"));
 // Account sections
 const AccountAddresses  = lazy(() => import("./pages/AccountAddresses"));
-const AccountPaymentMethods = lazy(() => import("./pages/AccountPaymentMethods"));
 const AccountNotifications = lazy(() => import("./pages/AccountNotifications"));
 const AccountSettings   = lazy(() => import("./pages/AccountSettings"));
 
@@ -92,7 +92,7 @@ const AnimatedRoutes = () => {
           <Route path="/account" element={<Suspense fallback={<PageSkeleton />}><Page><Outlet /></Page></Suspense>} >
             <Route index element={<AccountDashboard />} />
             <Route path="addresses" element={<AccountAddresses />} />
-            <Route path="payment-methods" element={<AccountPaymentMethods />} />
+            <Route path="payment-methods" element={<Navigate to="/account" replace />} />
             <Route path="notifications" element={<AccountNotifications />} />
             <Route path="settings" element={<AccountSettings />} />
           </Route>
@@ -105,6 +105,7 @@ const AnimatedRoutes = () => {
           <Route path="/reset-password" element={<Suspense fallback={null}><Page><ResetPassword /></Page></Suspense>} />
           <Route path="/admin/login" element={<Suspense fallback={null}><AdminLogin /></Suspense>} />
           <Route path="/admin" element={<Suspense fallback={null}><AdminRoute><AdminDashboard /></AdminRoute></Suspense>} />
+          <Route path="/admin/payment-qr" element={<Suspense fallback={null}><AdminRoute><AdminPaymentQr /></AdminRoute></Suspense>} />
           <Route path="/admin/products" element={<Suspense fallback={null}><AdminRoute><AdminProducts /></AdminRoute></Suspense>} />
           <Route path="/admin/orders" element={<Suspense fallback={null}><AdminRoute><AdminOrders /></AdminRoute></Suspense>} />
           <Route path="/admin/customers" element={<Suspense fallback={null}><AdminRoute><AdminCustomers /></AdminRoute></Suspense>} />

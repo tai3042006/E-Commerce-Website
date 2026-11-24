@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -13,7 +14,6 @@ import { Layout } from "@/components/clofit/Layout";
 import { Breadcrumbs } from "@/components/clofit/Breadcrumbs";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -66,8 +66,7 @@ const AccountAddresses = () => {
       const data = await res.json();
       setAddresses(data);
     } catch (err) {
-      console.error(err);
-      // TODO: show error toast
+      toast.error("Failed to load addresses");
     } finally {
       setLoading(false);
     }
@@ -112,8 +111,7 @@ const AccountAddresses = () => {
       setEditingId(null);
       fetchAddresses();
     } catch (err) {
-      console.error(err);
-      // TODO: show error toast
+      toast.error("Failed to save address");
     }
   };
 
@@ -132,8 +130,7 @@ const AccountAddresses = () => {
       if (!res.ok) throw new Error('Failed to delete address');
       fetchAddresses();
     } catch (err) {
-      console.error(err);
-      // TODO: show error toast
+      toast.error("Failed to delete address");
     }
   };
 
@@ -151,8 +148,7 @@ const AccountAddresses = () => {
       if (!res.ok) throw new Error('Failed to set default address');
       fetchAddresses();
     } catch (err) {
-      console.error(err);
-      // TODO: show error toast
+      toast.error("Failed to set default address");
     }
   };
 
@@ -271,12 +267,7 @@ const AccountAddresses = () => {
         )}
 
         {/* Add/Edit Address Modal */}
-        <DialogTrigger asChild>
-          <Button variant="outline" onClick={openAddModal} className="mt-6">
-            Add New Address
-          </Button>
-        </DialogTrigger>
-        <Dialog>
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
           <DialogContent className="w-full max-w-md">
             <DialogHeader>
               <DialogTitle>

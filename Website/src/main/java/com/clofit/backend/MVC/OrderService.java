@@ -1,6 +1,10 @@
 package com.clofit.backend.MVC;
 
 import com.clofit.backend.model.CartItem;
+import com.clofit.backend.observer.IObserver;
+import com.clofit.backend.observer.ISubject;
+import com.clofit.backend.state.PendingState;
+import com.clofit.backend.state.CancelledState;
 import com.clofit.backend.model.Customer;
 import com.clofit.backend.model.Order;
 import com.clofit.backend.model.OrderItem;

@@ -2,18 +2,9 @@ import { Link } from "react-router-dom";
 import { Logo } from "./Logo";
 
 const cols = [
-  {
-    title: "Shop",
-    links: ["Hoodies", "Tees", "Outerwear", "Accessories", "New Arrivals"],
-  },
-  {
-    title: "Help",
-    links: ["Shipping", "Returns", "Size Guide", "Order Tracking", "Contact"],
-  },
-  {
-    title: "Company",
-    links: ["About", "Careers", "Press", "Sustainability", "Stores"],
-  },
+  { title: "Shop", links: [["Hoodies", "/shop/hoodies"], ["Tees", "/shop/tees"], ["Shoes", "/shop/shoes"], ["Accessories", "/shop/accessories"]] },
+  { title: "Collections", links: [["All products", "/shop"], ["Men", "/shop/men"], ["Women", "/shop/women"]] },
+  { title: "Account", links: [["My orders", "/account"], ["Shipping addresses", "/account/addresses"], ["Wishlist", "/wishlist"], ["Cart", "/cart"]] },
 ];
 
 export const Footer = () => (
@@ -30,13 +21,13 @@ export const Footer = () => (
           <div key={col.title}>
             <h4 className="mb-4 text-sm font-semibold text-foreground">{col.title}</h4>
             <ul className="space-y-2.5">
-              {col.links.map((l) => (
-                <li key={l}>
+              {col.links.map(([label, path]) => (
+                <li key={path}>
                   <Link
-                    to="#"
+                    to={path}
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    {l}
+                    {label}
                   </Link>
                 </li>
               ))}

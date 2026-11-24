@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, ShoppingBag, Heart, MapPin, CreditCard, Bell, Settings, LogOut, ChevronRight, Package, Star } from "lucide-react";
+import { User, ShoppingBag, Heart, MapPin, Bell, Settings, LogOut, ChevronRight, Package, Star } from "lucide-react";
 import { Layout } from "@/components/clofit/Layout";
 import { Breadcrumbs } from "@/components/clofit/Breadcrumbs";
 import { useAuth } from "@/context/AuthContext.hooks";
@@ -20,6 +20,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 type ApiOrder = {
+  displayId?: string;
   id: string;
   date: string;
   total: number;
@@ -77,7 +78,7 @@ const Account = () => {
   }
 
   const initials = user.name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
-  const totalSpent = myOrders.reduce((s, o) => s + o.total, 0);
+  const totalSpent = myOrders.filter(o => o.status !== "awaiting_payment" && o.status !== "cancelled").reduce((s, o) => s + o.total, 0);
 
   return (
     <Layout>
@@ -125,16 +126,21 @@ const Account = () => {
               {myOrders.slice(0, 6).map(order => (
                 <div key={order.id} className="flex items-center justify-between gap-4 p-4">
                   <div>
-                    <p className="text-sm font-semibold">{order.id}</p>
+                    <p className="text-sm font-semibold">{order.displayId ?? order.id}</p>
                     <p className="text-xs text-muted-foreground">
                       {order.date ? new Date(order.date).toLocaleDateString("en-US") : "—"} · {order.items} item{order.items !== 1 ? "s" : ""}
                     </p>
                     <p className="text-xs text-muted-foreground">{order.product}</p>
                     <p className={`text-xs font-medium ${STATUS_COLOR[order.status] || ""}`}>
-                      {STATUS_LABEL[order.status] || order.status}
+                      {order.status === "awaiting_payment" ? "Awaiting payment" : STATUS_LABEL[order.status] || order.status}
                     </p>
                   </div>
-                  <p className="text-sm font-semibold">${Number(order.total).toFixed(2)}</p>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold">${Number(order.total).toFixed(2)}</p>
+                    {order.status === "awaiting_payment" && (
+                      <Link to={"/checkout?order=" + encodeURIComponent(order.id)} className="text-xs underline">Pay with VietQR</Link>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -149,7 +155,6 @@ const Account = () => {
             ]},
             { heading: "Account", items: [
               { icon: MapPin,     label: "Shipping Addresses",  to: "/account/addresses" },
-              { icon: CreditCard, label: "Payment Methods",     to: "/account/payment-methods" },
               { icon: Bell,       label: "Notifications",       to: "/account/notifications" },
               { icon: Settings,   label: "Settings",            to: "/account/settings" },
             ]},
